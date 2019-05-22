@@ -7,20 +7,44 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="256"
-   height="256"
-   viewBox="0 0 67.733332 67.733335"
+   width="179.19998"
+   height="400.00003"
+   viewBox="0 0 47.413328 105.83334"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (unknown)"
-   sodipodi:docname="logo.svg"
-   inkscape:export-filename="/home/art/Sourcecode/Python/EbookCreator/images/logo.png"
+   sodipodi:docname="background.svg"
+   inkscape:export-filename="/home/art/Sourcecode/Python/EbookCreator/images/background.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <defs
-     id="defs2" />
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1493">
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="0"
+         id="stop1489" />
+      <stop
+         style="stop-color:#333333;stop-opacity:0;"
+         offset="1"
+         id="stop1491" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1493"
+       id="linearGradient1495"
+       x1="-12.447616"
+       y1="267.98538"
+       x2="-12.447616"
+       y2="325.66638"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-0.34643197,0.17321618)" />
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -29,8 +53,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5274747"
-     inkscape:cx="120.30752"
-     inkscape:cy="92.605789"
+     inkscape:cx="235.43985"
+     inkscape:cy="203.56998"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -39,7 +63,11 @@
      inkscape:window-height="832"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -48,7 +76,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -56,17 +84,24 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-229.26665)">
+     transform="translate(30.462097,-220.52591)">
     <rect
-       style="fill:#ffffff;fill-opacity:1;stroke-width:0.26458332"
-       id="rect923"
-       width="68.00531"
-       height="68.149696"
-       x="0"
-       y="229.28343" />
+       style="fill:url(#linearGradient1495);fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       id="rect1475"
+       width="47.41333"
+       height="105.83334"
+       x="-30.462097"
+       y="220.52591" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.29008546"
+       id="rect1497"
+       width="32"
+       height="32"
+       x="-22.408998"
+       y="227.74712" />
     <g
        id="g1462"
-       transform="translate(2.5353877,2.5416538e-6)">
+       transform="matrix(0.53856631,0,0,0.53856631,-23.28297,102.03238)">
       <path
          sodipodi:nodetypes="ccccccccccsccccccccccccccccccscccc"
          inkscape:connector-curvature="0"

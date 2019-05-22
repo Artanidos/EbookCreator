@@ -44,7 +44,7 @@ class ProjectWizard(QWizard):
 
         os.mkdir(path)
         os.mkdir(os.path.join(path, "pages"))
-        
+
         with open(os.path.join(path, "book.qml"), "w") as f:
             f.write("import EbookCreator 1.0\n\n")
             f.write("Ebook {\n")
@@ -105,7 +105,7 @@ class ProjectInfoPage(QWizardPage):
         self.registerField("projectName*", self.projectNameLineEdit)
         self.registerField("description", self.descriptionLineEdit)
         self.registerField("author", self.authorLineEdit)
-        
+
         self.warning = QLabel("")
         self.warning.setStyleSheet("QLabel  color : orange ")
 

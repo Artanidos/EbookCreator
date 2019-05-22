@@ -59,10 +59,10 @@ class MainWindow(QMainWindow):
         self.text_edit.textChanged.connect(self.textChanged)
 
     def closeEvent(self, event):
-        #if self.maybeSave():
+        # if self.maybeSave():
         self.writeSettings()
         event.accept()
-        #else:
+        # else:
         #    event.ignore()
 
     def documentWasModified(self):
@@ -79,21 +79,11 @@ class MainWindow(QMainWindow):
         new_act.setShortcuts(QKeySequence.New)
         new_act.setStatusTip("Create a new ebook")
         new_act.triggered.connect(self.newFile)
-        
+
         open_act = QAction(open_icon, "&Open", self)
         open_act.setShortcuts(QKeySequence.Open)
         open_act.setStatusTip("Open an existing ebook")
         open_act.triggered.connect(self.open)
-        
-        #save_act = QAction(save_icon, "&Save", self)
-        #save_act.setShortcuts(QKeySequence.Save)
-        #save_act.setStatusTip("Save the document to disk")
-        #save_act.triggered.connect(self.save)
-
-        #save_as_act = QAction(save_as_icon, "Save &As...", self)
-        #save_as_act.setShortcuts(QKeySequence.SaveAs)
-        #save_as_act.setStatusTip("Save the document under a new name")
-        #save_as_act.triggered.connect(self.saveAs)
 
         exit_act = QAction(exit_icon, "E&xit", self)
         exit_act.setShortcuts(QKeySequence.Quit)
@@ -116,14 +106,12 @@ class MainWindow(QMainWindow):
         file_tool_bar = self.addToolBar("File")
         file_tool_bar.addAction(new_act)
         file_tool_bar.addAction(open_act)
-        #file_tool_bar.addAction(save_act)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
 
     def about(self):
-        QMessageBox.about(self, "About " + QCoreApplication.applicationName(),
-            "Using this appication you are able to create an ebook based on the markdown language.")
+        QMessageBox.about(self, "About " + QCoreApplication.applicationName(), "Using this appication you are able to create an ebook based on the markdown language.")
 
     def newFile(self):
         dlg = ProjectWizard(self.install_directory, parent = self)
@@ -162,79 +150,78 @@ class MainWindow(QMainWindow):
 
     def save(self):
         pass
-        #if not self.cur_file:
+        # if not self.cur_file:
         #    return self.saveAs()
-        #else:
+        # else:
         #    return self.saveFile(self.cur_file)
 
     def saveAs(self):
         pass
-        #dialog = QFileDialog(self)
-        #dialog.setWindowModality(Qt.WindowModal)
-        #dialog.setAcceptMode(QFileDialog.AcceptSave)
-        #if dialog.exec() != QDialog.Accepted:
-        #    return False
-        #return self.saveFile(dialog.selectedFiles()[0])
+        # dialog = QFileDialog(self)
+        # dialog.setWindowModality(Qt.WindowModal)
+        # dialog.setAcceptMode(QFileDialog.AcceptSave)
+        # if dialog.exec() != QDialog.Accepted:
+        #     return False
+        # return self.saveFile(dialog.selectedFiles()[0])
 
     def maybeSave(self):
         pass
-        #if not self.text_edit.document().isModified():
-        #    return True
-        #ret = QMessageBox.warning(self, QCoreApplication.applicationName(),
-        #                        "The document has been modified.\n"
-        #                        "Do you want to save your changes?",
-        #                        QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
-        #if ret == QMessageBox.Save:
-        #    return self.save()
-        #elif ret == QMessageBox.Cancel:
-        #    return False
-        #return True
+        # if not self.text_edit.document().isModified():
+        #     return True
+        # ret = QMessageBox.warning(self, QCoreApplication.applicationName(),
+        #                         "The document has been modified.\n"
+        #                         "Do you want to save your changes?",
+        #                         QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+        # if ret == QMessageBox.Save:
+        #     return self.save()
+        # elif ret == QMessageBox.Cancel:
+        #     return False
+        # return True
 
     def loadFile(self, fileName):
         pass
-        #with open(fileName, mode= "r") as f:
-        #    text = f.read()
+        # with open(fileName, mode= "r") as f:
+        #     text = f.read()
 
-        #QApplication.setOverrideCursor(Qt.WaitCursor)
-        #self.setCurrentFile(fileName)
-        #self.text_edit.setPlainText(text)
-        #self.text_edit.document().setModified(False)
-        #self.setWindowModified(False)
-        #QApplication.restoreOverrideCursor()        
-        #self.statusBar().showMessage("File loaded", 2000)
+        # QApplication.setOverrideCursor(Qt.WaitCursor)
+        # self.setCurrentFile(fileName)
+        # self.text_edit.setPlainText(text)
+        # self.text_edit.document().setModified(False)
+        # self.setWindowModified(False)
+        # QApplication.restoreOverrideCursor()
+        # self.statusBar().showMessage("File loaded", 2000)
 
     def saveFile(self, fileName):
         pass
-        #QApplication.setOverrideCursor(Qt.WaitCursor)
-        #with open(fileName, "w") as f:
-        #    f.write(self.text_edit.toPlainText())
-        #QApplication.restoreOverrideCursor()
+        # QApplication.setOverrideCursor(Qt.WaitCursor)
+        # with open(fileName, "w") as f:
+        #     f.write(self.text_edit.toPlainText())
+        # QApplication.restoreOverrideCursor()
 
-        #self.setCurrentFile(fileName)
-        #self.text_edit.document().setModified(False)
-        #self.setWindowModified(False)
-        #self.statusBar().showMessage("File saved", 2000)
+        # self.setCurrentFile(fileName)
+        # self.text_edit.document().setModified(False)
+        # self.setWindowModified(False)
+        # self.statusBar().showMessage("File saved", 2000)
 
     def setCurrentFile(self, fileName):
         pass
-        #self.cur_file = fileName
-        #shown_name = self.cur_file
-        #if not self.cur_file:
-        #    shown_name = "untitled.txt"
-        #self.setWindowFilePath(shown_name)
+        # self.cur_file = fileName
+        # shown_name = self.cur_file
+        # if not self.cur_file:
+        #     shown_name = "untitled.txt"
+        # self.setWindowFilePath(shown_name)
 
     def writeSettings(self):
         settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
         settings.setValue("geometry", self.saveGeometry())
 
     def readSettings(self):
-        settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName());
+        settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
         geometry = settings.value("geometry", QByteArray())
         if not geometry:
             availableGeometry = QApplication.desktop().availableGeometry(self)
             self.resize(availableGeometry.width() / 3, availableGeometry.height() / 2)
-            self.move((availableGeometry.width() - self.width()) / 2,
-                (availableGeometry.height() - self.height()) / 2)
+            self.move((availableGeometry.width() - self.width()) / 2, (availableGeometry.height() - self.height()) / 2)
         else:
             self.restoreGeometry(geometry)
 
@@ -254,4 +241,3 @@ class MainWindow(QMainWindow):
         context["content"] = mark_safe(markdown2.markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))
         html = eng.render_to_string("template.html", context=context)
         # todo
- 
