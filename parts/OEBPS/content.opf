@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="2.0" unique-identifier="BookId" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="BookId" opf:scheme="UUID">urn:uuid:01a4a5cd-cd14-4c7f-8f05-6ca0b1cb2976</dc:identifier>
+    <dc:language>en</dc:language>
+    <dc:title>[Title here]</dc:title>
+    <meta name="Sigil version" content="0.9.9" />
+    <dc:date opf:event="modification" xmlns:opf="http://www.idpf.org/2007/opf">2019-05-18</dc:date>
+  </metadata>
+  <manifest>
+    <item id="Section0001.xhtml" href="Text/Section0001.xhtml" media-type="application/xhtml+xml"/>
+    <item id="Style0001.css" href="Styles/Style0001.css" media-type="text/css"/>
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="Karla-Regular.ttf" href="Fonts/Karla-Regular.ttf" media-type="application/x-font-ttf"/>
+    <item id="Karla-Bold.ttf" href="Fonts/Karla-Bold.ttf" media-type="application/x-font-ttf"/>
+    <item id="Karla-BoldItalic.ttf" href="Fonts/Karla-BoldItalic.ttf" media-type="application/x-font-ttf"/>
+    <item id="Karla-Italic.ttf" href="Fonts/Karla-Italic.ttf" media-type="application/x-font-ttf"/>
+    <item id="DroidSansMono.ttf" href="Fonts/DroidSansMono.ttf" media-type="application/x-font-ttf"/>
+    <item id="Section0002.xhtml" href="Text/Section0002.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="Section0001.xhtml"/>
+    <itemref idref="Section0002.xhtml"/>
+  </spine>
+  <guide>
+  </guide>
+</package>
