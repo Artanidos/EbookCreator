@@ -27,7 +27,7 @@ class InstallDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self)
 
-        self.setWindowTitle("Install EbookCreaor")
+        self.setWindowTitle("EbookCreaor")
 
         hbox = QHBoxLayout()
         vbox = QVBoxLayout()
@@ -39,7 +39,7 @@ class InstallDialog(QDialog):
         self.install_directory = QDir.homePath() + "/EbookCreator"
         self.path.setText(self.install_directory)
         choose = QPushButton("...")
-        install = QPushButton("Install")
+        install = QPushButton("Use")
         install.setDefault(True)
         cancel = QPushButton("Cancel")
         pathBox.addWidget(self.path)
@@ -48,7 +48,7 @@ class InstallDialog(QDialog):
         hbox.addWidget(cancel)
         hbox.addWidget(install)
         vbox.addWidget(QLabel("EbookCreator is about to create a work directory onto your computer."))
-        vbox.addWidget(QLabel("Please choose a directory where the files should be stored."))
+        vbox.addWidget(QLabel("Please choose a directory where the source and book files should be stored."))
         vbox.addLayout(pathBox)
         vbox.addStretch()
         layout.addWidget(icon, 0, 0)
@@ -63,11 +63,6 @@ class InstallDialog(QDialog):
     @pyqtSlot()
     def installClicked(self):
         install_dir = QDir(self.path.text())
-        if install_dir.exists() and install_dir:
-            rc = QMessageBox.question(self, "Warning", "The folder already exists and is not empty. Do you really want to use this directory to install EbookCreator?")
-            if rc != QMessageBox.Yes:
-                return
-
         self.install_directory = self.path.text()
         self.close()
 
@@ -80,7 +75,7 @@ class InstallDialog(QDialog):
     def chooseClicked(self):
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.DirectoryOnly)
-        dialog.setWindowTitle("Install EbookCreator to ...")
+        dialog.setWindowTitle("Save EbookCreator files to ...")
         dialog.setOption(QFileDialog.DontUseNativeDialog, True)
         dialog.setAcceptMode(QFileDialog.AcceptOpen)
         dialog.setDirectory(self.path.text())

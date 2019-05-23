@@ -47,23 +47,6 @@ if __name__ == "__main__":
     font = QFont("Sans Serif", 10)
     app.setFont(font)
 
-    # p = app.palette()
-    # p.setColor(QPalette.Window, QColor(53, 53, 53))
-    # p.setColor(QPalette.WindowText, Qt.white)
-    # p.setColor(QPalette.Base, QColor(64, 66, 68))
-    # p.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-    # p.setColor(QPalette.ToolTipBase, Qt.white)
-    # p.setColor(QPalette.ToolTipText, Qt.black)
-    # p.setColor(QPalette.Text, Qt.white)
-    # p.setColor(QPalette.Button, QColor(53, 53, 53))
-    # p.setColor(QPalette.ButtonText, Qt.white)
-    # p.setColor(QPalette.BrightText, Qt.red)
-    # p.setColor(QPalette.Highlight, QColor("#45bbe6"))
-    # p.setColor(QPalette.HighlightedText, Qt.black)
-    # p.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
-    # p.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
-    # p.setColor(QPalette.Link, QColor("#bbb"))
-    # app.setPalette(p)
     app.setWindowIcon(QIcon("images/logo.svg"))
 
     settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
@@ -75,9 +58,12 @@ if __name__ == "__main__":
         if not install_directory:
             sys.exit(-1)
         settings.setValue("installDirectory", install_directory)
-        os.mkdir(install_directory)
-        os.mkdir(os.path.join(install_directory, "sources"))
-        os.mkdir(os.path.join(install_directory, "books"))
+        if not os.path.isdir(install_directory):
+            os.mkdir(install_directory)
+        if not os.path.isdir(os.path.join(install_directory, "sources")):
+            os.mkdir(os.path.join(install_directory, "sources"))
+        if not os.path.isdir(os.path.join(install_directory, "books")):
+            os.mkdir(os.path.join(install_directory, "books"))
         del dlg
 
     win = MainWindow(install_directory)

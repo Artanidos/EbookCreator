@@ -72,3 +72,40 @@ class Ebook(QObject):
 
     def setWindow(self, window):
         self.window = window
+
+    def getPage(self, name):
+        for page in self._pages:
+            if page.name == name or page.src == name.lower() + ".md":
+                return page
+        return None
+
+    def dropPage(self, pagename):
+        page = self.getPage(pagename)
+        filename = os.path.join(self.source_path, "pages", page.src)
+        os.remove(filename)
+        self._pages.remove(page)
+        self.save()
+
+    def addPage(self, name):
+        page = Page()
+        page.name = name
+        page.src = name.replace(" ", "").lower() + ".md"
+        self._pages.append(page)
+        with open(os.path.join(self.source_path, "pages", page.src), "w") as f:
+            f.write("")
+        self.save()
+
+    def save(self):
+        fname = os.path.join(self.source_path, self.filename)
+        with open(fname, "w") as f:
+            f.write("import EbookCreator 1.0\n\n")
+            f.write("Ebook {\n")
+            f.write("    name: \"" + self._name + "\"\n")
+            f.write("    description: \"" + self._description + "\"\n")
+            f.write("    author: \"" + self._author + "\"\n")
+            for page in self._pages:
+                f.write("    Page {\n")
+                f.write("        src: \"" + page.src + "\"\n")
+                f.write("        name: \"" + page.name + "\"\n")
+                f.write("    }\n")
+            f.write("}\n")

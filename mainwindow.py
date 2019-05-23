@@ -20,8 +20,8 @@
 
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QDockWidget, QScrollArea, QSizePolicy, QHBoxLayout, QVBoxLayout, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
-from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl
+from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QDockWidget, QScrollArea, QSizePolicy, QHBoxLayout, QVBoxLayout, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
+from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtQml import QQmlEngine, QQmlComponent
@@ -33,6 +33,7 @@ from expander import Expander
 from flatbutton import FlatButton
 from hyperlink import HyperLink
 from ebook import Ebook
+from markdownedit import MarkdownEdit
 
 
 class MainWindow(QMainWindow):
@@ -68,9 +69,14 @@ class MainWindow(QMainWindow):
         self.content_list.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
         content_box = QVBoxLayout()
         content_box.addWidget(self.content_list)
+        self.item_edit = QLineEdit()
+        self.item_edit.setMaximumHeight(0)
+        self.item_edit.editingFinished.connect(self.addItem)
+        self.item_anim = QPropertyAnimation(self.item_edit, "maximumHeight".encode("utf-8"))
+        content_box.addWidget(self.item_edit)
         button_layout = QHBoxLayout()
         plus_button = FlatButton("./images/plus_normal.png", "./images/plus_hover.png")
-        trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png")
+        self.trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png")
         self.up_button = FlatButton("./images/up_normal.png", "./images/up_hover.png", disabled_icon = "./images/up_disabled.png")
         self.down_button = FlatButton("./images/down_normal.png", "./images/down_hover.png", disabled_icon = "./images/down_disabled.png")
         self.up_button.enabled = False
@@ -78,11 +84,11 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(plus_button)
         button_layout.addWidget(self.up_button)
         button_layout.addWidget(self.down_button)
-        button_layout.addWidget(trash_button)
+        button_layout.addWidget(self.trash_button)
         content_box.addLayout(button_layout)
         self.content.addLayout(content_box)
         plus_button.clicked.connect(self.addPage)
-        trash_button.clicked.connect(self.dropPage)
+        self.trash_button.clicked.connect(self.dropPage)
         self.up_button.clicked.connect(self.pageUp)
         self.down_button.clicked.connect(self.pageDown)
 
@@ -113,7 +119,7 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, self.navigationdock)
 
         self.splitter = QSplitter()
-        self.text_edit = QTextEdit("")
+        self.text_edit = MarkdownEdit()
         self.text_edit.setFont(QFont("Courier", 11))
         self.preview = QWebEngineView()
         self.preview.setMinimumWidth(300)
@@ -129,10 +135,33 @@ class MainWindow(QMainWindow):
         self.content_list.currentItemChanged.connect(self.pageSelectionChanged)
 
     def addPage(self):
-        pass
+        self.item_edit.setText("")
+        self.item_edit.setFocus()
+        self.item_anim.setStartValue(0)
+        self.item_anim.setEndValue(23)
+        self.item_anim.start()
+
+    def addItem(self):
+        text = self.item_edit.text()
+        if text:
+            if not self.book.getPage(text):
+                self.book.addPage(text)
+                self.loadBook(self.last_book)                
+        self.item_anim.setStartValue(23)
+        self.item_anim.setEndValue(0)
+        self.item_anim.start()
 
     def dropPage(self):
-        pass
+        item = self.content_list.currentItem().data(1).name
+        msgBox = QMessageBox()
+        msgBox.setText("You are about to delete the page <i>" + item + "</i>")
+        msgBox.setInformativeText("Do you really want to delete the item?")
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        msgBox.setDefaultButton(QMessageBox.Cancel)
+        ret = msgBox.exec()
+        if ret == QMessageBox.Yes:
+            self.book.dropPage(item)
+            self.loadBook(self.last_book)
 
     def pageUp(self):
         pass
@@ -141,10 +170,17 @@ class MainWindow(QMainWindow):
         pass
 
     def pageSelectionChanged(self, item):
-        page = item.data(1)
-        self.filename = os.path.join(self.book.source_path, "pages", page.src)
-        with open(self.filename, "r") as f:
-            self.text_edit.setText(f.read())
+        if item:
+            page = item.data(1)
+            self.filename = os.path.join(self.book.source_path, "pages", page.src)
+            with open(self.filename, "r") as f:
+                self.text_edit.setText(f.read())
+            self.trash_button.enabled = True
+        else:
+            self.text_edit.setText("")
+            self.trash_button.enabled = False
+            self.up_button.enabled = False
+            self.down_button.enabled = False
 
     def contentExpanded(self, value):
         if value:
@@ -220,6 +256,7 @@ class MainWindow(QMainWindow):
 
     def loadBook(self, filename):
         self.last_book = filename
+        self.filename = ""
         engine = QQmlEngine()
         component = QQmlComponent(engine)
         component.loadUrl(QUrl(filename))
@@ -256,6 +293,7 @@ class MainWindow(QMainWindow):
         if not fileName:
             return
         self.loadBook(fileName)
+        
 
     def writeSettings(self):
         settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
@@ -274,8 +312,9 @@ class MainWindow(QMainWindow):
             self.restoreGeometry(geometry)
 
     def textChanged(self):
-        with open(self.filename, "w") as f:
-            f.write(self.text_edit.toPlainText())
+        if self.filename:
+            with open(self.filename, "w") as f:
+                f.write(self.text_edit.toPlainText())
 
         html = "<html><head></head><link href=\"../Styles/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
         html += mark_safe(markdown2.markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))

@@ -62,7 +62,7 @@ class Expander(QWidget):
         hbox.addSpacing(5)
         hbox.addWidget(self.hyper)
         hbox.addStretch()
-        hbox.setContentsMargins(8, 8, 8, 8)
+        hbox.setContentsMargins(4, 4, 4, 4)
         vbox.addLayout(hbox)
         self.content = QWidget()
         self.content.setStyleSheet("background-color: " + self.palette().base().color().name())

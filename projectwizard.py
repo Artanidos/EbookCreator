@@ -40,7 +40,7 @@ class ProjectWizard(QWizard):
         projectName = self.field("projectName")
         description = self.field("description")
         author = self.field("author")
-        path = os.path.join(self.install_directory, "sources", projectName.lower())
+        path = os.path.join(self.install_directory, "sources", projectName.replace(" ", "").lower())
 
         os.mkdir(path)
         os.mkdir(os.path.join(path, "pages"))
@@ -51,6 +51,10 @@ class ProjectWizard(QWizard):
             f.write("    name: \"" + projectName + "\"\n")
             f.write("    description: \"" + description + "\"\n")
             f.write("    author: \"" + author + "\"\n")
+            f.write("    Page {\n")
+            f.write("        src: \"first.md\"\n")
+            f.write("        name: \"First\"\n")
+            f.write("    }")
             f.write("}\n")
 
         with open(os.path.join(path, "pages", "first.md"), "w") as f:
