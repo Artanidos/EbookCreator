@@ -20,7 +20,7 @@
 
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
+from PyQt5.QtWidgets import QApplication, QWidget, QDockWidget, QScrollArea, QSizePolicy, QHBoxLayout, QVBoxLayout, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
 from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl
 from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -29,6 +29,10 @@ import markdown2
 from django.template import Context, Engine
 from django.utils.safestring import mark_safe
 from projectwizard import ProjectWizard
+from expander import Expander
+from flatbutton import FlatButton
+from hyperlink import HyperLink
+from ebook import Ebook
 
 
 class MainWindow(QMainWindow):
@@ -36,27 +40,126 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.install_directory = install_directory
         self.book = None
-        self.cur_file = ""
-        self.splitter1 = QSplitter()
-        self.splitter2 = QSplitter()
-        self.listview = QListWidget()
-        self.listview.setMinimumWidth(50)
-        self.listview.setMaximumWidth(250)
+        self.last_book = ""
+        self.filename = ""
+
+        self.createUi()
+        self.createMenus()
+        self.createStatusBar()
+        self.readSettings()
+        self.text_edit.textChanged.connect(self.textChanged)
+
+        if self.last_book:
+            self.loadBook(self.last_book)
+
+    def createUi(self):
+        self.content = Expander("Content", "./images/pages_normal.png", "./images/pages_hover.png", "./images/pages_selected.png")
+        self.appearance = Expander("Appearance", "./images/appearance_normal.png", "./images/appearance_hover.png", "./images/appearance_selected.png")
+        self.settings = Expander("Settings", "./images/settings_normal.png", "./images/settings_hover.png", "./images/settings_selected.png")
+
+        self.setWindowTitle(QCoreApplication.applicationName() + " " + QCoreApplication.applicationVersion())
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.content)
+        vbox.addWidget(self.appearance)
+        vbox.addWidget(self.settings)
+        vbox.addStretch()
+
+        self.content_list = QListWidget()
+        self.content_list.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+        content_box = QVBoxLayout()
+        content_box.addWidget(self.content_list)
+        button_layout = QHBoxLayout()
+        plus_button = FlatButton("./images/plus_normal.png", "./images/plus_hover.png")
+        trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png")
+        self.up_button = FlatButton("./images/up_normal.png", "./images/up_hover.png", disabled_icon = "./images/up_disabled.png")
+        self.down_button = FlatButton("./images/down_normal.png", "./images/down_hover.png", disabled_icon = "./images/down_disabled.png")
+        self.up_button.enabled = False
+        self.down_button.enabled = False
+        button_layout.addWidget(plus_button)
+        button_layout.addWidget(self.up_button)
+        button_layout.addWidget(self.down_button)
+        button_layout.addWidget(trash_button)
+        content_box.addLayout(button_layout)
+        self.content.addLayout(content_box)
+        plus_button.clicked.connect(self.addPage)
+        trash_button.clicked.connect(self.dropPage)
+        self.up_button.clicked.connect(self.pageUp)
+        self.down_button.clicked.connect(self.pageDown)
+
+        app_box = QVBoxLayout()
+        themes_button = HyperLink("Themes")
+        menus_button = HyperLink("Menus")
+        self.theme_settings_button = HyperLink("Theme Settings")
+        self.theme_settings_button.setVisible(False)
+        app_box.addWidget(menus_button)
+        app_box.addWidget(themes_button)
+        app_box.addWidget(self.theme_settings_button)
+        self.appearance.addLayout(app_box)
+
+        scroll_content = QWidget()
+        scroll_content.setLayout(vbox)
+        scroll = QScrollArea()
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setWidget(scroll_content)
+        scroll.setWidgetResizable(True)
+        scroll.setMaximumWidth(200)
+        scroll.setMinimumWidth(200)
+
+        self.navigationdock = QDockWidget("Navigation", self)
+        self.navigationdock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.navigationdock.setWidget(scroll)
+        self.navigationdock.setObjectName("Navigation")
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.navigationdock)
+
+        self.splitter = QSplitter()
         self.text_edit = QTextEdit("")
         self.text_edit.setFont(QFont("Courier", 11))
         self.preview = QWebEngineView()
         self.preview.setMinimumWidth(300)
         self.setWindowTitle(QCoreApplication.applicationName() + "[*]")
-        self.splitter2.addWidget(self.text_edit)
-        self.splitter2.addWidget(self.preview)
-        self.splitter1.addWidget(self.listview)
-        self.splitter1.addWidget(self.splitter2)
-        self.setCentralWidget(self.splitter1)
-        self.createMenus()
-        self.createStatusBar()
-        self.readSettings()
-        self.text_edit.document().contentsChanged.connect(self.documentWasModified)
-        self.text_edit.textChanged.connect(self.textChanged)
+
+        self.splitter.addWidget(self.text_edit)
+        self.splitter.addWidget(self.preview)
+        self.setCentralWidget(self.splitter)
+
+        self.content.expanded.connect(self.contentExpanded)
+        self.appearance.expanded.connect(self.appearanceExpanded)
+        self.settings.expanded.connect(self.settingsExpanded)
+        self.content_list.currentItemChanged.connect(self.pageSelectionChanged)
+
+    def addPage(self):
+        pass
+
+    def dropPage(self):
+        pass
+
+    def pageUp(self):
+        pass
+
+    def pageDown(self):
+        pass
+
+    def pageSelectionChanged(self, item):
+        page = item.data(1)
+        self.filename = os.path.join(self.book.source_path, "pages", page.src)
+        with open(self.filename, "r") as f:
+            self.text_edit.setText(f.read())
+
+    def contentExpanded(self, value):
+        if value:
+            self.appearance.setExpanded(False)
+            self.settings.setExpanded(False)
+
+    def appearanceExpanded(self, value):
+        if value:
+            self.content.setExpanded(False)
+            self.settings.setExpanded(False)
+
+    def settingsExpanded(self, value):
+        if value:
+            self.content.setExpanded(False)
+            self.appearance.setExpanded(False)
 
     def closeEvent(self, event):
         # if self.maybeSave():
@@ -64,9 +167,6 @@ class MainWindow(QMainWindow):
         event.accept()
         # else:
         #    event.ignore()
-
-    def documentWasModified(self):
-        self.setWindowModified(self.text_edit.document().isModified())
 
     def createMenus(self):
         new_icon = QIcon("./images/new.png")
@@ -119,6 +219,7 @@ class MainWindow(QMainWindow):
         dlg.show()
 
     def loadBook(self, filename):
+        self.last_book = filename
         engine = QQmlEngine()
         component = QQmlComponent(engine)
         component.loadUrl(QUrl(filename))
@@ -130,7 +231,15 @@ class MainWindow(QMainWindow):
             for error in component.errors():
                 print(error.toString())
                 return
-        self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name + "[*]")
+
+        self.content_list.clear()
+        for page in self.book.pages:
+            item = QListWidgetItem()
+            item.setText(page.name)
+            item.setData(1, page)
+            self.content_list.addItem(item)
+
+        self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
 
     def open(self):
         fileName = ""
@@ -147,86 +256,16 @@ class MainWindow(QMainWindow):
         if not fileName:
             return
         self.loadBook(fileName)
-        item1 = QListWidgetItem()
-        item1.setText("First")
-        self.listview.addItem(item1)
-        item2 = QListWidgetItem()
-        item2.setText("Second")
-        self.listview.addItem(item2)
-        item3 = QListWidgetItem()
-        item3.setText("Third")
-        self.listview.addItem(item3)
-
-    def save(self):
-        pass
-        # if not self.cur_file:
-        #    return self.saveAs()
-        # else:
-        #    return self.saveFile(self.cur_file)
-
-    def saveAs(self):
-        pass
-        # dialog = QFileDialog(self)
-        # dialog.setWindowModality(Qt.WindowModal)
-        # dialog.setAcceptMode(QFileDialog.AcceptSave)
-        # if dialog.exec() != QDialog.Accepted:
-        #     return False
-        # return self.saveFile(dialog.selectedFiles()[0])
-
-    def maybeSave(self):
-        pass
-        # if not self.text_edit.document().isModified():
-        #     return True
-        # ret = QMessageBox.warning(self, QCoreApplication.applicationName(),
-        #                         "The document has been modified.\n"
-        #                         "Do you want to save your changes?",
-        #                         QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
-        # if ret == QMessageBox.Save:
-        #     return self.save()
-        # elif ret == QMessageBox.Cancel:
-        #     return False
-        # return True
-
-    def loadFile(self, fileName):
-        pass
-        # with open(fileName, mode= "r") as f:
-        #     text = f.read()
-
-        # QApplication.setOverrideCursor(Qt.WaitCursor)
-        # self.setCurrentFile(fileName)
-        # self.text_edit.setPlainText(text)
-        # self.text_edit.document().setModified(False)
-        # self.setWindowModified(False)
-        # QApplication.restoreOverrideCursor()
-        # self.statusBar().showMessage("File loaded", 2000)
-
-    def saveFile(self, fileName):
-        pass
-        # QApplication.setOverrideCursor(Qt.WaitCursor)
-        # with open(fileName, "w") as f:
-        #     f.write(self.text_edit.toPlainText())
-        # QApplication.restoreOverrideCursor()
-
-        # self.setCurrentFile(fileName)
-        # self.text_edit.document().setModified(False)
-        # self.setWindowModified(False)
-        # self.statusBar().showMessage("File saved", 2000)
-
-    def setCurrentFile(self, fileName):
-        pass
-        # self.cur_file = fileName
-        # shown_name = self.cur_file
-        # if not self.cur_file:
-        #     shown_name = "untitled.txt"
-        # self.setWindowFilePath(shown_name)
 
     def writeSettings(self):
         settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
         settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("lastBook", self.last_book)
 
     def readSettings(self):
         settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
         geometry = settings.value("geometry", QByteArray())
+        self.last_book = settings.value("lastBook")
         if not geometry:
             availableGeometry = QApplication.desktop().availableGeometry(self)
             self.resize(availableGeometry.width() / 3, availableGeometry.height() / 2)
@@ -235,6 +274,9 @@ class MainWindow(QMainWindow):
             self.restoreGeometry(geometry)
 
     def textChanged(self):
+        with open(self.filename, "w") as f:
+            f.write(self.text_edit.toPlainText())
+
         html = "<html><head></head><link href=\"../Styles/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
         html += mark_safe(markdown2.markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))
         html += "</body></html>"

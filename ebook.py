@@ -18,17 +18,28 @@
 #
 #############################################################################
 
-from PyQt5.QtCore import QObject, pyqtProperty
+import os
+from PyQt5.QtCore import QObject, pyqtProperty, QFileInfo, Q_CLASSINFO
+from PyQt5.QtQml import QQmlListProperty
+from page import Page
 
 
 class Ebook(QObject):
+    Q_CLASSINFO('DefaultProperty', 'pages')
+
     def __init__(self, parent = None):
         super().__init__(parent)
         self._name = ""
         self._author = ""
         self._description = ""
+        self._pages = []
         self.filename = ""
+        self.source_path = ""
         self.window = ""
+
+    @pyqtProperty(QQmlListProperty)
+    def pages(self):
+        return QQmlListProperty(Page, self, self._pages)
 
     @pyqtProperty('QString')
     def name(self):
@@ -55,7 +66,9 @@ class Ebook(QObject):
         self._description = description
 
     def setFilename(self, filename):
-        self.filename = filename
+        info = QFileInfo(filename)
+        self.filename = info.fileName()
+        self.source_path = info.path()
 
     def setWindow(self, window):
         self.window = window
