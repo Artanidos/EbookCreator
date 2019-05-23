@@ -20,7 +20,7 @@
 
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QSplitter, QTreeView, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
+from PyQt5.QtWidgets import QApplication, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
 from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl
 from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -39,9 +39,9 @@ class MainWindow(QMainWindow):
         self.cur_file = ""
         self.splitter1 = QSplitter()
         self.splitter2 = QSplitter()
-        self.treeview = QTreeView()
-        self.treeview.setMinimumWidth(100)
-        self.treeview.setMaximumWidth(300)
+        self.listview = QListWidget()
+        self.listview.setMinimumWidth(50)
+        self.listview.setMaximumWidth(250)
         self.text_edit = QTextEdit("")
         self.text_edit.setFont(QFont("Courier", 11))
         self.preview = QWebEngineView()
@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(QCoreApplication.applicationName() + "[*]")
         self.splitter2.addWidget(self.text_edit)
         self.splitter2.addWidget(self.preview)
-        self.splitter1.addWidget(self.treeview)
+        self.splitter1.addWidget(self.listview)
         self.splitter1.addWidget(self.splitter2)
         self.setCentralWidget(self.splitter1)
         self.createMenus()
@@ -147,6 +147,15 @@ class MainWindow(QMainWindow):
         if not fileName:
             return
         self.loadBook(fileName)
+        item1 = QListWidgetItem()
+        item1.setText("First")
+        self.listview.addItem(item1)
+        item2 = QListWidgetItem()
+        item2.setText("Second")
+        self.listview.addItem(item2)
+        item3 = QListWidgetItem()
+        item3.setText("Third")
+        self.listview.addItem(item3)
 
     def save(self):
         pass

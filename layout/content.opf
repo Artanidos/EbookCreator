@@ -4,7 +4,7 @@
     <dc:identifier id="BookId" opf:scheme="UUID">urn:uuid:01a4a5cd-cd14-4c7f-8f05-6ca0b1cb2976</dc:identifier>
     <dc:language>en</dc:language>
     <dc:title>[Title here]</dc:title>
-    <meta name="Sigil version" content="0.9.9" />
+    <meta name="EbookCreator version" content="1.0.0" />
     <dc:date opf:event="modification" xmlns:opf="http://www.idpf.org/2007/opf">2019-05-18</dc:date>
   </metadata>
   <manifest>
@@ -17,11 +17,14 @@
     <item id="Karla-Italic.ttf" href="Fonts/Karla-Italic.ttf" media-type="application/x-font-ttf"/>
     <item id="DroidSansMono.ttf" href="Fonts/DroidSansMono.ttf" media-type="application/x-font-ttf"/>
     <item id="Section0002.xhtml" href="Text/Section0002.xhtml" media-type="application/xhtml+xml"/>
+    <item id="toc.html" href="Text/toc.html" media-type="application/xhtml+xml"/>
   </manifest>
   <spine toc="ncx">
+    <itemref idref="toc.html"/>
     <itemref idref="Section0001.xhtml"/>
     <itemref idref="Section0002.xhtml"/>
   </spine>
   <guide>
+    <reference type="toc" title="Table of Contents" href="Text/toc.html"/>
   </guide>
 </package>

@@ -10,14 +10,19 @@
   <docTitle>
     <text>{{ title }}</text>
   </docTitle>
-  <navMap>
+  <navPoint id="navPoint-0" playOrder="0">
+      <navLabel>
+        <text>Toc</text>
+      </navLabel>
+      <content src="Text/toc.html"/>
+    </navPoint>
     <navPoint id="navPoint-1" playOrder="1">
       <navLabel>
         <text>Chapter 1</text>
       </navLabel>
       <content src="Text/Section0001.xhtml"/>
     </navPoint>
-	<navPoint id="navPoint-1" playOrder="2">
+    <navPoint id="navPoint-2" playOrder="2">
       <navLabel>
         <text>Chapter 2</text>
       </navLabel>
