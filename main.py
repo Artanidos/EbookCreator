@@ -26,7 +26,7 @@ from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor
 from PyQt5.QtQml import qmlRegisterType
 from mainwindow import MainWindow
 from ebook import Ebook
-from page import Page
+from part import Part
 from installdialog import InstallDialog
 
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     app.setStyleSheet("QPushButton:hover { color: #45bbe6 }")
 
     qmlRegisterType(Ebook, 'EbookCreator', 1, 0, 'Ebook')
-    qmlRegisterType(Page, 'EbookCreator', 1, 0, 'Page')
+    qmlRegisterType(Part, 'EbookCreator', 1, 0, 'Part')
 
     font = QFont("Sans Serif", 10)
     app.setFont(font)

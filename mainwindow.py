@@ -25,8 +25,7 @@ from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl, QPro
 from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtQml import QQmlEngine, QQmlComponent
-import markdown2
-from django.template import Context, Engine
+from markdown2 import markdown
 from django.utils.safestring import mark_safe
 from projectwizard import ProjectWizard
 from expander import Expander
@@ -34,6 +33,7 @@ from flatbutton import FlatButton
 from hyperlink import HyperLink
 from ebook import Ebook
 from markdownedit import MarkdownEdit
+from generator import createEpub
 
 
 class MainWindow(QMainWindow):
@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
             self.loadBook(self.last_book)
 
     def createUi(self):
-        self.content = Expander("Content", "./images/pages_normal.png", "./images/pages_hover.png", "./images/pages_selected.png")
+        self.content = Expander("Content", "./images/parts_normal.png", "./images/parts_hover.png", "./images/parts_selected.png")
         self.appearance = Expander("Appearance", "./images/appearance_normal.png", "./images/appearance_hover.png", "./images/appearance_selected.png")
         self.settings = Expander("Settings", "./images/settings_normal.png", "./images/settings_hover.png", "./images/settings_selected.png")
 
@@ -87,10 +87,10 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.trash_button)
         content_box.addLayout(button_layout)
         self.content.addLayout(content_box)
-        plus_button.clicked.connect(self.addPage)
-        self.trash_button.clicked.connect(self.dropPage)
-        self.up_button.clicked.connect(self.pageUp)
-        self.down_button.clicked.connect(self.pageDown)
+        plus_button.clicked.connect(self.addPart)
+        self.trash_button.clicked.connect(self.dropPart)
+        self.up_button.clicked.connect(self.partUp)
+        self.down_button.clicked.connect(self.partDown)
 
         app_box = QVBoxLayout()
         themes_button = HyperLink("Themes")
@@ -132,9 +132,9 @@ class MainWindow(QMainWindow):
         self.content.expanded.connect(self.contentExpanded)
         self.appearance.expanded.connect(self.appearanceExpanded)
         self.settings.expanded.connect(self.settingsExpanded)
-        self.content_list.currentItemChanged.connect(self.pageSelectionChanged)
+        self.content_list.currentItemChanged.connect(self.partSelectionChanged)
 
-    def addPage(self):
+    def addPart(self):
         self.item_edit.setText("")
         self.item_edit.setFocus()
         self.item_anim.setStartValue(0)
@@ -144,35 +144,35 @@ class MainWindow(QMainWindow):
     def addItem(self):
         text = self.item_edit.text()
         if text:
-            if not self.book.getPage(text):
-                self.book.addPage(text)
-                self.loadBook(self.last_book)                
+            if not self.book.getPart(text):
+                self.book.addPart(text)
+                self.loadBook(self.last_book)
         self.item_anim.setStartValue(23)
         self.item_anim.setEndValue(0)
         self.item_anim.start()
 
-    def dropPage(self):
+    def dropPart(self):
         item = self.content_list.currentItem().data(1).name
         msgBox = QMessageBox()
-        msgBox.setText("You are about to delete the page <i>" + item + "</i>")
+        msgBox.setText("You are about to delete the part <i>" + item + "</i>")
         msgBox.setInformativeText("Do you really want to delete the item?")
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         msgBox.setDefaultButton(QMessageBox.Cancel)
         ret = msgBox.exec()
         if ret == QMessageBox.Yes:
-            self.book.dropPage(item)
+            self.book.dropPart(item)
             self.loadBook(self.last_book)
 
-    def pageUp(self):
+    def partUp(self):
         pass
 
-    def pageDown(self):
+    def partDown(self):
         pass
 
-    def pageSelectionChanged(self, item):
+    def partSelectionChanged(self, item):
         if item:
-            page = item.data(1)
-            self.filename = os.path.join(self.book.source_path, "pages", page.src)
+            part = item.data(1)
+            self.filename = os.path.join(self.book.source_path, "parts", part.src)
             with open(self.filename, "r") as f:
                 self.text_edit.setText(f.read())
             self.trash_button.enabled = True
@@ -207,8 +207,7 @@ class MainWindow(QMainWindow):
     def createMenus(self):
         new_icon = QIcon("./images/new.png")
         open_icon = QIcon("./images/open.png")
-        save_icon = QIcon("./images/save.png")
-        save_as_icon = QIcon("./images/save_as.png")
+        book_icon = QIcon("./images/save_as.png")
         exit_icon = QIcon("./images/exit.png")
 
         new_act = QAction(new_icon, "&New", self)
@@ -220,6 +219,11 @@ class MainWindow(QMainWindow):
         open_act.setShortcuts(QKeySequence.Open)
         open_act.setStatusTip("Open an existing ebook")
         open_act.triggered.connect(self.open)
+
+        book_act = QAction(book_icon, "&Create Book", self)
+        book_act.setShortcuts(QKeySequence.SaveAs)
+        book_act.setStatusTip("Create an ebook")
+        book_act.triggered.connect(self.create)
 
         exit_act = QAction(exit_icon, "E&xit", self)
         exit_act.setShortcuts(QKeySequence.Quit)
@@ -233,6 +237,7 @@ class MainWindow(QMainWindow):
         file_menu = self.menuBar().addMenu("&File")
         file_menu.addAction(new_act)
         file_menu.addAction(open_act)
+        file_menu.addAction(book_act)
         file_menu.addSeparator()
         file_menu.addAction(exit_act)
 
@@ -242,6 +247,7 @@ class MainWindow(QMainWindow):
         file_tool_bar = self.addToolBar("File")
         file_tool_bar.addAction(new_act)
         file_tool_bar.addAction(open_act)
+        file_tool_bar.addAction(book_act)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
@@ -270,10 +276,10 @@ class MainWindow(QMainWindow):
                 return
 
         self.content_list.clear()
-        for page in self.book.pages:
+        for part in self.book.parts:
             item = QListWidgetItem()
-            item.setText(page.name)
-            item.setData(1, page)
+            item.setText(part.name)
+            item.setData(1, part)
             self.content_list.addItem(item)
 
         self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
@@ -293,7 +299,6 @@ class MainWindow(QMainWindow):
         if not fileName:
             return
         self.loadBook(fileName)
-        
 
     def writeSettings(self):
         settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
@@ -316,18 +321,25 @@ class MainWindow(QMainWindow):
             with open(self.filename, "w") as f:
                 f.write(self.text_edit.toPlainText())
 
-        html = "<html><head></head><link href=\"../Styles/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
-        html += mark_safe(markdown2.markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))
+        html = "<html><head></head><link href=\"../assets/css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
+        html += mark_safe(markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))
         html += "</body></html>"
-        self.preview.setHtml(html, baseUrl = QUrl("file://" + os.getcwd() + "/parts/OEBPS/Text/"))
+        self.preview.setHtml(html, baseUrl = QUrl("file://" + os.getcwd() + "/themes/default/layout/"))
 
-    def createEpub(self):
-        path = os.getcwd()
-        dirs = [
-            path + "/layout",
-        ]
-        eng = Engine(dirs = dirs, debug = True)
-        context = {}
-        context["content"] = mark_safe(markdown2.markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))
-        html = eng.render_to_string("template.html", context=context)
-        # todo
+    def create(self):
+        filename = ""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setNameFilter("ePub3 (*.epub);;All (*)")
+        dialog.setWindowTitle("Create Ebook")
+        dialog.setOption(QFileDialog.DontUseNativeDialog, True)
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setDirectory(self.install_directory)
+        dialog.setDefaultSuffix("epub")
+        if dialog.exec_():
+            filename = dialog.selectedFiles()[0]
+        del dialog
+        if not filename:
+            return
+
+        createEpub(filename, self.book)

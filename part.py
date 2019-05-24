@@ -22,7 +22,7 @@ import os
 from PyQt5.QtCore import QObject, pyqtProperty
 
 
-class Page(QObject):
+class Part(QObject):
 
     def __init__(self, parent = None):
         super().__init__(parent)

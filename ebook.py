@@ -21,25 +21,25 @@
 import os
 from PyQt5.QtCore import QObject, pyqtProperty, QFileInfo, Q_CLASSINFO
 from PyQt5.QtQml import QQmlListProperty
-from page import Page
+from part import Part
 
 
 class Ebook(QObject):
-    Q_CLASSINFO('DefaultProperty', 'pages')
+    Q_CLASSINFO('DefaultProperty', 'parts')
 
     def __init__(self, parent = None):
         super().__init__(parent)
         self._name = ""
         self._author = ""
         self._description = ""
-        self._pages = []
+        self._parts = []
         self.filename = ""
         self.source_path = ""
         self.window = ""
 
     @pyqtProperty(QQmlListProperty)
-    def pages(self):
-        return QQmlListProperty(Page, self, self._pages)
+    def parts(self):
+        return QQmlListProperty(Part, self, self._parts)
 
     @pyqtProperty('QString')
     def name(self):
@@ -73,25 +73,25 @@ class Ebook(QObject):
     def setWindow(self, window):
         self.window = window
 
-    def getPage(self, name):
-        for page in self._pages:
-            if page.name == name or page.src == name.lower() + ".md":
-                return page
+    def getPart(self, name):
+        for part in self._parts:
+            if part.name == name or part.src == name.lower() + ".md":
+                return part
         return None
 
-    def dropPage(self, pagename):
-        page = self.getPage(pagename)
-        filename = os.path.join(self.source_path, "pages", page.src)
+    def dropPart(self, partname):
+        part = self.getPart(partname)
+        filename = os.path.join(self.source_path, "parts", part.src)
         os.remove(filename)
-        self._pages.remove(page)
+        self._parts.remove(part)
         self.save()
 
-    def addPage(self, name):
-        page = Page()
-        page.name = name
-        page.src = name.replace(" ", "").lower() + ".md"
-        self._pages.append(page)
-        with open(os.path.join(self.source_path, "pages", page.src), "w") as f:
+    def addPart(self, name):
+        part = Part()
+        part.name = name
+        part.src = name.replace(" ", "").lower() + ".md"
+        self._parts.append(part)
+        with open(os.path.join(self.source_path, "parts", part.src), "w") as f:
             f.write("")
         self.save()
 
@@ -103,9 +103,9 @@ class Ebook(QObject):
             f.write("    name: \"" + self._name + "\"\n")
             f.write("    description: \"" + self._description + "\"\n")
             f.write("    author: \"" + self._author + "\"\n")
-            for page in self._pages:
-                f.write("    Page {\n")
-                f.write("        src: \"" + page.src + "\"\n")
-                f.write("        name: \"" + page.name + "\"\n")
+            for part in self._parts:
+                f.write("    Part {\n")
+                f.write("        src: \"" + part.src + "\"\n")
+                f.write("        name: \"" + part.name + "\"\n")
                 f.write("    }\n")
             f.write("}\n")

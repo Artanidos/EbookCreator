@@ -43,7 +43,7 @@ class ProjectWizard(QWizard):
         path = os.path.join(self.install_directory, "sources", projectName.replace(" ", "").lower())
 
         os.mkdir(path)
-        os.mkdir(os.path.join(path, "pages"))
+        os.mkdir(os.path.join(path, "parts"))
 
         with open(os.path.join(path, "book.qml"), "w") as f:
             f.write("import EbookCreator 1.0\n\n")
@@ -51,14 +51,14 @@ class ProjectWizard(QWizard):
             f.write("    name: \"" + projectName + "\"\n")
             f.write("    description: \"" + description + "\"\n")
             f.write("    author: \"" + author + "\"\n")
-            f.write("    Page {\n")
+            f.write("    Part {\n")
             f.write("        src: \"first.md\"\n")
             f.write("        name: \"First\"\n")
             f.write("    }")
             f.write("}\n")
 
-        with open(os.path.join(path, "pages", "first.md"), "w") as f:
-            f.write("##" + projectName + "\n")
+        with open(os.path.join(path, "parts", "first.md"), "w") as f:
+            f.write("#" + projectName + "\n")
 
         super().accept()
         self.loadBook.emit(path + "/book.qml")
