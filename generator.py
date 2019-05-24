@@ -51,7 +51,7 @@ def createEpub(output, book, theme = "default"):
         for file in files:
             zip.write(file)
     os.chdir(path)
-    # rmtree(dir)
+    rmtree(dir)
 
 
 def getAllFiles(dir):
