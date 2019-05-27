@@ -20,9 +20,10 @@
 
 import sys
 import os
+import pathlib
 from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QDockWidget, QScrollArea, QSizePolicy, QHBoxLayout, QVBoxLayout, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
 from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl, QPropertyAnimation
-from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor
+from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor, QTextCursor
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtQml import QQmlEngine, QQmlComponent
 from markdown2 import markdown
@@ -198,17 +199,16 @@ class MainWindow(QMainWindow):
             self.appearance.setExpanded(False)
 
     def closeEvent(self, event):
-        # if self.maybeSave():
         self.writeSettings()
         event.accept()
-        # else:
-        #    event.ignore()
 
     def createMenus(self):
         new_icon = QIcon("./images/new.png")
         open_icon = QIcon("./images/open.png")
         book_icon = QIcon("./images/save_as.png")
         exit_icon = QIcon("./images/exit.png")
+        bold_icon = QIcon("./images/textbold.png")
+        italic_icon = QIcon("./images/textitalic.png")
 
         new_act = QAction(new_icon, "&New", self)
         new_act.setShortcuts(QKeySequence.New)
@@ -230,6 +230,14 @@ class MainWindow(QMainWindow):
         exit_act.setStatusTip("Exit the application")
         exit_act.triggered.connect(self.close)
 
+        bold_act = QAction(bold_icon, "Bold", self)
+        bold_act.setShortcuts(Qt.CTRL + Qt.Key_B)
+        bold_act.triggered.connect(self.bold)
+
+        italic_act = QAction(italic_icon, "Italic", self)
+        italic_act.setShortcuts(Qt.CTRL + Qt.Key_I)
+        italic_act.triggered.connect(self.italic)
+
         about_act = QAction("&About", self)
         about_act.triggered.connect(self.about)
         about_act.setStatusTip("Show the application's About box")
@@ -241,6 +249,10 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(exit_act)
 
+        edit_menu = self.menuBar().addMenu("&Format")
+        edit_menu.addAction(bold_act)
+        edit_menu.addAction(italic_act)
+
         help_menu = self.menuBar().addMenu("&Help")
         help_menu.addAction(about_act)
 
@@ -248,6 +260,10 @@ class MainWindow(QMainWindow):
         file_tool_bar.addAction(new_act)
         file_tool_bar.addAction(open_act)
         file_tool_bar.addAction(book_act)
+
+        format_tool_bar = self.addToolBar("Format")
+        format_tool_bar.addAction(bold_act)
+        format_tool_bar.addAction(italic_act)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
@@ -316,15 +332,33 @@ class MainWindow(QMainWindow):
         else:
             self.restoreGeometry(geometry)
 
+    def bold(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        if not cursor.hasSelection():
+            cursor.select(QTextCursor.WordUnderCursor)
+        cursor.insertText("**" + cursor.selectedText() + "**")
+        cursor.setPosition(pos + 2)
+        self.text_edit.setTextCursor(cursor)
+
+    def italic(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        if not cursor.hasSelection():
+            cursor.select(QTextCursor.WordUnderCursor)
+        cursor.insertText("*" + cursor.selectedText() + "*")
+        cursor.setPosition(pos + 1)
+        self.text_edit.setTextCursor(cursor)
+
     def textChanged(self):
         if self.filename:
             with open(self.filename, "w") as f:
                 f.write(self.text_edit.toPlainText())
 
-        html = "<html><head></head><link href=\"../assets/css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
+        html = "<html><head></head><link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
         html += mark_safe(markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))
         html += "</body></html>"
-        self.preview.setHtml(html, baseUrl = QUrl("file://" + os.getcwd() + "/themes/default/layout/"))
+        self.preview.setHtml(html, baseUrl = QUrl(pathlib.Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
 
     def create(self):
         filename = ""
