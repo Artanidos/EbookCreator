@@ -20,6 +20,7 @@
 
 import os
 import datetime
+import shutil
 from PyQt5.QtWidgets import QWizard, QWizardPage, QLabel, QLineEdit, QComboBox, QGridLayout, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QDir
 from PyQt5.QtGui import QPixmap
@@ -38,19 +39,20 @@ class ProjectWizard(QWizard):
 
     def accept(self):
         projectName = self.field("projectName")
-        description = self.field("description")
-        author = self.field("author")
+        language = self.field("language")
+        theme = self.field("theme")
         path = os.path.join(self.install_directory, "sources", projectName.replace(" ", "").lower())
 
         os.mkdir(path)
         os.mkdir(os.path.join(path, "parts"))
+        os.mkdir(os.path.join(path, "images"))
 
         with open(os.path.join(path, "book.qml"), "w") as f:
             f.write("import EbookCreator 1.0\n\n")
             f.write("Ebook {\n")
             f.write("    name: \"" + projectName + "\"\n")
-            f.write("    description: \"" + description + "\"\n")
-            f.write("    author: \"" + author + "\"\n")
+            f.write("    language: \"" + language + "\"\n")
+            f.write("    theme: \"" + theme + "\"\n")
             f.write("    Part {\n")
             f.write("        src: \"first.md\"\n")
             f.write("        name: \"First\"\n")
@@ -59,6 +61,8 @@ class ProjectWizard(QWizard):
 
         with open(os.path.join(path, "parts", "first.md"), "w") as f:
             f.write("#" + projectName + "\n")
+
+        shutil.copytree(os.path.join(os.getcwd(), "themes", theme, "assets", "css"), os.path.join(path, "css"))
 
         super().accept()
         self.loadBook.emit(path + "/book.qml")
@@ -96,19 +100,25 @@ class ProjectInfoPage(QWizardPage):
         self.projectNameLabel.setBuddy(self.projectNameLineEdit)
         self.projectNameLineEdit.setPlaceholderText("Book title")
 
-        self.descriptionLabel = QLabel("&Description:")
-        self.descriptionLineEdit = QLineEdit()
-        self.descriptionLabel.setBuddy(self.descriptionLineEdit)
-        self.descriptionLineEdit.setPlaceholderText("Book description")
+        self.languageLabel = QLabel("&Language:")
+        self.language = QComboBox()
+        self.language.setEditable(True)
+        self.languageLabel.setBuddy(self.language)
+        self.language.addItem("de")
+        self.language.addItem("en")
+        self.language.addItem("es")
+        self.language.addItem("fr")
+        self.language.addItem("it")
 
-        self.authorLabel = QLabel("&Author")
-        self.authorLineEdit = QLineEdit()
-        self.authorLabel.setBuddy(self.authorLineEdit)
-        self.authorLineEdit.setPlaceholderText("Author")
+        self.themeLabel = QLabel("&Theme")
+        self.theme = QComboBox()
+        self.themeLabel.setBuddy(self.theme)
+        # todo, add all other themes
+        self.theme.addItem("default")
 
         self.registerField("projectName*", self.projectNameLineEdit)
-        self.registerField("description", self.descriptionLineEdit)
-        self.registerField("author", self.authorLineEdit)
+        self.registerField("language", self.language, "currentText")
+        self.registerField("theme", self.theme, "currentText")
 
         self.warning = QLabel("")
         self.warning.setStyleSheet("QLabel  color : orange ")
@@ -116,10 +126,10 @@ class ProjectInfoPage(QWizardPage):
         layout = QGridLayout()
         layout.addWidget(self.projectNameLabel, 0, 0)
         layout.addWidget(self.projectNameLineEdit, 0, 1)
-        layout.addWidget(self.descriptionLabel, 1, 0)
-        layout.addWidget(self.descriptionLineEdit, 1, 1)
-        layout.addWidget(self.authorLabel, 2, 0)
-        layout.addWidget(self.authorLineEdit, 2, 1)
+        layout.addWidget(self.languageLabel, 1, 0)
+        layout.addWidget(self.language, 1, 1)
+        layout.addWidget(self.themeLabel, 2, 0)
+        layout.addWidget(self.theme, 2, 1)
         layout.addWidget(self.warning, 4, 0, 1, 2)
         self.setLayout(layout)
         self.projectNameLineEdit.textChanged.connect(self.projectNameChanged)

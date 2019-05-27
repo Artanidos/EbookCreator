@@ -30,8 +30,8 @@ class Ebook(QObject):
     def __init__(self, parent = None):
         super().__init__(parent)
         self._name = ""
-        self._author = ""
-        self._description = ""
+        self._theme = ""
+        self._language = ""
         self._parts = []
         self.filename = ""
         self.source_path = ""
@@ -50,20 +50,20 @@ class Ebook(QObject):
         self._name = name
 
     @pyqtProperty('QString')
-    def author(self):
-        return self._author
+    def language(self):
+        return self._language
 
-    @author.setter
-    def author(self, author):
-        self._author = author
+    @language.setter
+    def language(self, language):
+        self._language = language
 
     @pyqtProperty('QString')
-    def description(self):
-        return self._description
+    def theme(self):
+        return self._theme
 
-    @description.setter
-    def description(self, description):
-        self._description = description
+    @theme.setter
+    def theme(self, theme):
+        self._theme = theme
 
     def setFilename(self, filename):
         info = QFileInfo(filename)
@@ -101,8 +101,8 @@ class Ebook(QObject):
             f.write("import EbookCreator 1.0\n\n")
             f.write("Ebook {\n")
             f.write("    name: \"" + self._name + "\"\n")
-            f.write("    description: \"" + self._description + "\"\n")
-            f.write("    author: \"" + self._author + "\"\n")
+            f.write("    language: \"" + self._language + "\"\n")
+            f.write("    theme: \"" + self._theme + "\"\n")
             for part in self._parts:
                 f.write("    Part {\n")
                 f.write("        src: \"" + part.src + "\"\n")

@@ -30,20 +30,20 @@ from django.utils.safestring import mark_safe
 from zipfile import ZipFile
 
 
-def createEpub(output, book, theme = "default"):
+def createEpub(output, book):
     dir = mkdtemp()
     guid = str(uuid.uuid4())
-    copyAssets(dir, theme)
+    copyAssets(dir, book.theme)
     os.mkdir(os.path.join(dir, "OEBPS", "parts"))
     os.mkdir(os.path.join(dir, "META-INF"))
     path = os.getcwd()
 
     writeMimetype(dir)
     writeContainer(dir)
-    generatePackage(dir, book, theme, guid)
-    generateParts(dir, book, theme)
-    generateToc(dir, book, theme)
-    generateTocNcx(dir, book, theme, guid)
+    generatePackage(dir, book, guid)
+    generateParts(dir, book)
+    generateToc(dir, book)
+    generateTocNcx(dir, book, guid)
 
     os.chdir(dir)
     files = getAllFiles(dir)
@@ -82,10 +82,10 @@ def writeContainer(dir):
         f.write("</container>\n")
 
 
-def generatePackage(dir, book, theme, uuid):
+def generatePackage(dir, book, uuid):
     context = {}
     context["uuid"] = uuid
-    context["lang"] = "en"
+    context["lang"] = book.language
     context["title"] = book.name
     context["date"] = datetime.datetime.now().strftime("%Y-%m-%d")
     items = []
@@ -109,7 +109,7 @@ def generatePackage(dir, book, theme, uuid):
     context["spine"] = spine
     path = os.getcwd()
     dirs = [
-        path + "/themes/" + theme + "/layout",
+        path + "/themes/" + book.theme + "/layout",
     ]
     eng = Engine(dirs = dirs, debug = False)
     xml = eng.render_to_string("package.opf", context = context)
@@ -117,10 +117,10 @@ def generatePackage(dir, book, theme, uuid):
         f.write(xml)
 
 
-def generateParts(dir, book, theme):
+def generateParts(dir, book):
     path = os.getcwd()
     dirs = [
-        path + "/themes/" + theme + "/layout",
+        path + "/themes/" + book.theme + "/layout",
     ]
     eng = Engine(dirs = dirs, debug = False)
     for part in book._parts:
@@ -138,7 +138,7 @@ def copyAssets(dir, theme):
     shutil.copytree(os.path.join(path, "themes", theme, "assets"), os.path.join(dir, "OEBPS"))
 
 
-def generateToc(dir, book, theme):
+def generateToc(dir, book):
     path = os.getcwd()
     parts = []
     toc = {}
@@ -154,7 +154,7 @@ def generateToc(dir, book, theme):
 
     context["parts"] = parts
     dirs = [
-        path + "/themes/" + theme + "/layout",
+        path + "/themes/" + book.theme + "/layout",
     ]
     eng = Engine(dirs = dirs, debug = False)
     xhtml = eng.render_to_string("toc.xhtml", context = context)
@@ -162,7 +162,7 @@ def generateToc(dir, book, theme):
         f.write(xhtml)
 
 
-def generateTocNcx(dir, book, theme, uuid):
+def generateTocNcx(dir, book, uuid):
     order = 0
     path = os.getcwd()
     parts = []
@@ -187,7 +187,7 @@ def generateTocNcx(dir, book, theme, uuid):
 
     context["navs"] = parts
     dirs = [
-        path + "/themes/" + theme + "/layout",
+        path + "/themes/" + book.theme + "/layout",
     ]
     eng = Engine(dirs = dirs, debug = False)
     xhtml = eng.render_to_string("toc.ncx", context = context)
