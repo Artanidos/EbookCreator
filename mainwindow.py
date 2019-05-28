@@ -19,8 +19,9 @@
 #############################################################################
 
 import sys
-import os
-import pathlib
+from os import path, remove, walk
+from pathlib import Path
+from shutil import copy
 from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QDockWidget, QScrollArea, QSizePolicy, QHBoxLayout, QVBoxLayout, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
 from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor, QTextCursor
@@ -56,12 +57,14 @@ class MainWindow(QMainWindow):
 
     def createUi(self):
         self.content = Expander("Content", "./images/parts_normal.png", "./images/parts_hover.png", "./images/parts_selected.png")
+        self.images = Expander("Images", "./images/images_normal.png", "./images/images_hover.png", "./images/images_selected.png")
         self.appearance = Expander("Appearance", "./images/appearance_normal.png", "./images/appearance_hover.png", "./images/appearance_selected.png")
         self.settings = Expander("Settings", "./images/settings_normal.png", "./images/settings_hover.png", "./images/settings_selected.png")
 
         self.setWindowTitle(QCoreApplication.applicationName() + " " + QCoreApplication.applicationVersion())
         vbox = QVBoxLayout()
         vbox.addWidget(self.content)
+        vbox.addWidget(self.images)
         vbox.addWidget(self.appearance)
         vbox.addWidget(self.settings)
         vbox.addStretch()
@@ -77,9 +80,10 @@ class MainWindow(QMainWindow):
         content_box.addWidget(self.item_edit)
         button_layout = QHBoxLayout()
         plus_button = FlatButton("./images/plus_normal.png", "./images/plus_hover.png")
-        self.trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png")
+        self.trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png", disabled_icon = "./images/trash_disabled.png")
         self.up_button = FlatButton("./images/up_normal.png", "./images/up_hover.png", disabled_icon = "./images/up_disabled.png")
         self.down_button = FlatButton("./images/down_normal.png", "./images/down_hover.png", disabled_icon = "./images/down_disabled.png")
+        self.trash_button.enabled = False
         self.up_button.enabled = False
         self.down_button.enabled = False
         button_layout.addWidget(plus_button)
@@ -92,6 +96,21 @@ class MainWindow(QMainWindow):
         self.trash_button.clicked.connect(self.dropPart)
         self.up_button.clicked.connect(self.partUp)
         self.down_button.clicked.connect(self.partDown)
+
+        self.image_list = QListWidget()
+        self.image_list.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+        image_box = QVBoxLayout()
+        image_box.addWidget(self.image_list)
+        image_button_layout = QHBoxLayout()
+        image_plus_button = FlatButton("./images/plus_normal.png", "./images/plus_hover.png")
+        self.image_trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png", disabled_icon = "./images/trash_disabled.png")
+        self.image_trash_button.enabled = False
+        image_button_layout.addWidget(image_plus_button)
+        image_button_layout.addWidget(self.image_trash_button)
+        image_box.addLayout(image_button_layout)
+        self.images.addLayout(image_box)
+        image_plus_button.clicked.connect(self.addImage)
+        self.image_trash_button.clicked.connect(self.dropImage)
 
         app_box = QVBoxLayout()
         themes_button = HyperLink("Themes")
@@ -131,9 +150,12 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.splitter)
 
         self.content.expanded.connect(self.contentExpanded)
+        self.images.expanded.connect(self.imagesExpanded)
         self.appearance.expanded.connect(self.appearanceExpanded)
         self.settings.expanded.connect(self.settingsExpanded)
         self.content_list.currentItemChanged.connect(self.partSelectionChanged)
+        self.image_list.currentItemChanged.connect(self.imageSelectionChanged)
+        self.image_list.itemDoubleClicked.connect(self.insertImage)
 
     def addPart(self):
         self.item_edit.setText("")
@@ -164,6 +186,41 @@ class MainWindow(QMainWindow):
             self.book.dropPart(item)
             self.loadBook(self.last_book)
 
+    def addImage(self):
+        fileName = ""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setNameFilter("Image Files(*.png *.jpg *.bmp *.gif);;All (*)")
+        dialog.setWindowTitle("Load Image")
+        dialog.setOption(QFileDialog.DontUseNativeDialog, True)
+        dialog.setAcceptMode(QFileDialog.AcceptOpen)
+        if dialog.exec_():
+            fileName = dialog.selectedFiles()[0]
+        del dialog
+        if not fileName:
+            return
+        copy(fileName, path.join(self.book.source_path, "images"))
+        item = QListWidgetItem()
+        item.setText(Path(fileName).name)
+        item.setData(1, path.join(self.book.source_path, "images", Path(fileName).name))
+        self.image_list.addItem(item)
+
+    def dropImage(self):
+        item = self.image_list.currentItem()
+        image = item.data(1)
+        filename = path.join(self.book.source_path, "parts", image)
+        remove(filename)
+        self.loadImages()
+
+    def loadImages(self):
+        self.image_list.clear()
+        for root, dir, files in walk(path.join(self.book.source_path, "images")):
+            for file in files:
+                item = QListWidgetItem()
+                item.setText(Path(file).name)
+                item.setData(1, path.join(self.book.source_path, "images", Path(file).name))
+                self.image_list.addItem(item)
+
     def partUp(self):
         pass
 
@@ -173,7 +230,7 @@ class MainWindow(QMainWindow):
     def partSelectionChanged(self, item):
         if item:
             part = item.data(1)
-            self.filename = os.path.join(self.book.source_path, "parts", part.src)
+            self.filename = path.join(self.book.source_path, "parts", part.src)
             with open(self.filename, "r") as f:
                 self.text_edit.setText(f.read())
             self.trash_button.enabled = True
@@ -183,19 +240,34 @@ class MainWindow(QMainWindow):
             self.up_button.enabled = False
             self.down_button.enabled = False
 
+    def imageSelectionChanged(self, item):
+        if item:
+            self.image_trash_button.enabled = True
+        else:
+            self.image_trash_button.enabled = False
+
     def contentExpanded(self, value):
         if value:
+            self.images.setExpanded(False)
+            self.appearance.setExpanded(False)
+            self.settings.setExpanded(False)
+
+    def imagesExpanded(self, value):
+        if value:
+            self.content.setExpanded(False)
             self.appearance.setExpanded(False)
             self.settings.setExpanded(False)
 
     def appearanceExpanded(self, value):
         if value:
             self.content.setExpanded(False)
+            self.images.setExpanded(False)
             self.settings.setExpanded(False)
 
     def settingsExpanded(self, value):
         if value:
             self.content.setExpanded(False)
+            self.images.setExpanded(False)
             self.appearance.setExpanded(False)
 
     def closeEvent(self, event):
@@ -205,25 +277,30 @@ class MainWindow(QMainWindow):
     def createMenus(self):
         new_icon = QIcon("./images/new.png")
         open_icon = QIcon("./images/open.png")
-        book_icon = QIcon("./images/save_as.png")
+        book_icon = QIcon("./images/book.png")
         exit_icon = QIcon("./images/exit.png")
-        bold_icon = QIcon("./images/textbold.png")
-        italic_icon = QIcon("./images/textitalic.png")
+        bold_icon = QIcon("./images/bold.png")
+        italic_icon = QIcon("./images/italic.png")
+        strike_icon = QIcon("./images/strike.png")
+        image_icon = QIcon("./images/image.png")
 
         new_act = QAction(new_icon, "&New", self)
         new_act.setShortcuts(QKeySequence.New)
-        new_act.setStatusTip("Create a new ebook")
+        new_act.setStatusTip("Create a new ebook project")
         new_act.triggered.connect(self.newFile)
+        new_act.setToolTip("Create new ebook project")
 
         open_act = QAction(open_icon, "&Open", self)
         open_act.setShortcuts(QKeySequence.Open)
-        open_act.setStatusTip("Open an existing ebook")
+        open_act.setStatusTip("Open an existing ebook project")
         open_act.triggered.connect(self.open)
+        open_act.setToolTip("Open an existing ebook project")
 
         book_act = QAction(book_icon, "&Create Book", self)
         book_act.setShortcuts(QKeySequence.SaveAs)
         book_act.setStatusTip("Create an ebook")
         book_act.triggered.connect(self.create)
+        book_act.setToolTip("Create an ebook")
 
         exit_act = QAction(exit_icon, "E&xit", self)
         exit_act.setShortcuts(QKeySequence.Quit)
@@ -231,12 +308,21 @@ class MainWindow(QMainWindow):
         exit_act.triggered.connect(self.close)
 
         bold_act = QAction(bold_icon, "Bold", self)
-        bold_act.setShortcuts(Qt.CTRL + Qt.Key_B)
+        bold_act.setShortcut(Qt.CTRL + Qt.Key_B)
         bold_act.triggered.connect(self.bold)
 
         italic_act = QAction(italic_icon, "Italic", self)
-        italic_act.setShortcuts(Qt.CTRL + Qt.Key_I)
+        italic_act.setShortcut(Qt.CTRL + Qt.Key_I)
         italic_act.triggered.connect(self.italic)
+
+        strike_act = QAction(strike_icon, "Striketrough", self)
+        strike_act.setShortcut(Qt.CTRL + Qt.Key_S)
+        strike_act.triggered.connect(self.strike)
+
+        image_act = QAction(image_icon, "Image", self)
+        image_act.setShortcut(Qt.CTRL + Qt.Key_G)
+        image_act.triggered.connect(self.insertImage)
+        image_act.setToolTip("Insert an image")
 
         about_act = QAction("&About", self)
         about_act.triggered.connect(self.about)
@@ -249,9 +335,13 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(exit_act)
 
-        edit_menu = self.menuBar().addMenu("&Format")
-        edit_menu.addAction(bold_act)
-        edit_menu.addAction(italic_act)
+        format_menu = self.menuBar().addMenu("&Format")
+        format_menu.addAction(bold_act)
+        format_menu.addAction(italic_act)
+        format_menu.addAction(strike_act)
+
+        insert_menu = self.menuBar().addMenu("&Insert")
+        insert_menu.addAction(image_act)
 
         help_menu = self.menuBar().addMenu("&Help")
         help_menu.addAction(about_act)
@@ -264,6 +354,32 @@ class MainWindow(QMainWindow):
         format_tool_bar = self.addToolBar("Format")
         format_tool_bar.addAction(bold_act)
         format_tool_bar.addAction(italic_act)
+        format_tool_bar.addAction(strike_act)
+
+        insert_toolbar = self.addToolBar("Insert")
+        insert_toolbar.addAction(image_act)
+
+    def insertImage(self):
+        if not self.book:
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to load or create a book first!")
+            return
+        if not self.filename:
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to select part from the book content first!")
+            return
+        if self.image_list.count() == 0:
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to add an image to the image list first!")
+            return
+        if not self.image_list.currentItem():
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to select an image from the image list first!")
+            return
+
+        item = self.image_list.currentItem()
+        filename = item.text()
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        cursor.insertText("![AltText](../images/" + filename + " \"Title\")")
+        cursor.setPosition(pos)
+        self.text_edit.setTextCursor(cursor)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
@@ -298,6 +414,7 @@ class MainWindow(QMainWindow):
             item.setData(1, part)
             self.content_list.addItem(item)
 
+        self.loadImages()
         self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
 
     def open(self):
@@ -308,7 +425,7 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle("Load Ebook")
         dialog.setOption(QFileDialog.DontUseNativeDialog, True)
         dialog.setAcceptMode(QFileDialog.AcceptOpen)
-        dialog.setDirectory(os.path.join(self.install_directory, "sources"))
+        dialog.setDirectory(path.join(self.install_directory, "sources"))
         if dialog.exec_():
             fileName = dialog.selectedFiles()[0]
         del dialog
@@ -333,6 +450,9 @@ class MainWindow(QMainWindow):
             self.restoreGeometry(geometry)
 
     def bold(self):
+        if not self.filename:
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to select part from the book content first!")
+            return
         cursor = self.text_edit.textCursor()
         pos = cursor.position()
         if not cursor.hasSelection():
@@ -342,6 +462,9 @@ class MainWindow(QMainWindow):
         self.text_edit.setTextCursor(cursor)
 
     def italic(self):
+        if not self.filename:
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to select part from the book content first!")
+            return
         cursor = self.text_edit.textCursor()
         pos = cursor.position()
         if not cursor.hasSelection():
@@ -350,15 +473,27 @@ class MainWindow(QMainWindow):
         cursor.setPosition(pos + 1)
         self.text_edit.setTextCursor(cursor)
 
+    def strike(self):
+        if not self.filename:
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to select part from the book content first!")
+            return
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        if not cursor.hasSelection():
+            cursor.select(QTextCursor.WordUnderCursor)
+        cursor.insertText("~~" + cursor.selectedText() + "~~")
+        cursor.setPosition(pos + 2)
+        self.text_edit.setTextCursor(cursor)
+
     def textChanged(self):
         if self.filename:
             with open(self.filename, "w") as f:
                 f.write(self.text_edit.toPlainText())
 
         html = "<html><head></head><link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
-        html += mark_safe(markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks"]))
+        html += mark_safe(markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks", "strike"]))
         html += "</body></html>"
-        self.preview.setHtml(html, baseUrl = QUrl(pathlib.Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
+        self.preview.setHtml(html, baseUrl = QUrl(Path(path.join(self.book.source_path, "parts", "index.html")).as_uri()))
 
     def create(self):
         filename = ""

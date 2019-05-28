@@ -69,11 +69,11 @@ class FlatButton(QLabel):
     def mouseReleaseEvent(self, event):
         if self.enabled:
             self.setPixmap(self.hover_icon)
-        event.accept()
-        if not self.returncode:
-            self.clicked.emit()
-        else:
-            self.clickedWithReturn.emit(self.returncode)
+            event.accept()
+            if not self.returncode:
+                self.clicked.emit()
+            else:
+                self.clickedWithReturn.emit(self.returncode)
 
     def enterEvent(self, event):
         if self.enabled:
@@ -92,5 +92,8 @@ class FlatButton(QLabel):
     @enabled.setter
     def enabled(self, enabled):
         self._enabled = enabled
-        self.setPixmap(self.disabled_icon)
+        if enabled:
+            self.setPixmap(self.normal_icon)
+        else:
+            self.setPixmap(self.disabled_icon)
         self.update()
