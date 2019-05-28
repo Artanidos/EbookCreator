@@ -26,9 +26,9 @@ from shutil import copy
 from django.utils.safestring import mark_safe
 from markdown2 import markdown
 from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
-                          QSettings, Qt, QUrl)
+                          QSettings, Qt, QUrl, QSize)
 from PyQt5.QtGui import (QColor, QFont, QIcon, QKeySequence, QPalette,
-                         QTextCursor)
+                         QTextCursor, QImage, QPixmap)
 from PyQt5.QtQml import QQmlComponent, QQmlEngine
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QDockWidget,
@@ -232,10 +232,11 @@ class MainWindow(QMainWindow):
         self.image_list.clear()
         for root, dir, files in walk(path.join(self.book.source_path, "images")):
             for file in files:
+                filename = path.join(self.book.source_path, "images", Path(file).name)
                 item = QListWidgetItem()
                 item.setToolTip("Doubleclick image to insert into text")
                 item.setText(Path(file).name)
-                item.setData(1, path.join(self.book.source_path, "images", Path(file).name))
+                item.setData(1, filename)
                 self.image_list.addItem(item)
 
     def partUp(self):
@@ -508,9 +509,10 @@ class MainWindow(QMainWindow):
                 f.write(self.text_edit.toPlainText())
 
         html = "<html><head></head><link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
-        html += mark_safe(markdown(self.text_edit.toPlainText(), ..., extras=["fenced-code-blocks", "strike"]))
+        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "strike"]))
         html += "</body></html>"
         self.preview.setHtml(html, baseUrl = QUrl(Path(path.join(self.book.source_path, "parts", "index.html")).as_uri()))
+        print(html)
 
     def create(self):
         filename = ""
@@ -527,5 +529,6 @@ class MainWindow(QMainWindow):
         del dialog
         if not filename:
             return
-
-        createEpub(filename, self.book)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        createEpub(filename, self.book, self)
+        QApplication.restoreOverrideCursor()

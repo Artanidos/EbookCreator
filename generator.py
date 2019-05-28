@@ -30,14 +30,16 @@ from django.utils.safestring import mark_safe
 from zipfile import ZipFile
 
 
-def createEpub(output, book):
+def createEpub(output, book, win):
     dir = mkdtemp()
     guid = str(uuid.uuid4())
     copyAssets(dir, book.theme)
     os.mkdir(os.path.join(dir, "OEBPS", "parts"))
+    os.mkdir(os.path.join(dir, "OEBPS", "images"))
     os.mkdir(os.path.join(dir, "META-INF"))
     path = os.getcwd()
 
+    copyImages(dir, book)
     writeMimetype(dir)
     writeContainer(dir)
     generatePackage(dir, book, guid)
@@ -52,6 +54,7 @@ def createEpub(output, book):
             zip.write(file)
     os.chdir(path)
     rmtree(dir)
+    win.statusBar().showMessage("Ready")
 
 
 def getAllFiles(dir):
@@ -104,6 +107,15 @@ def generatePackage(dir, book, uuid):
         items.append(item)
         spine.append(part.name)
 
+    for root, dirs, files in os.walk(os.path.join(dir, "OEBPS", "images")):
+        for file in files:
+            filename, extension = os.path.splitext(file)
+            item = {}
+            item["href"] = os.path.join("images", file)
+            item["id"] = filename
+            item["type"] = "image/" + extension[1:]
+            items.append(item)
+
     context["spine"] = ["nav", "toc"]
     context["items"] = items
     context["spine"] = spine
@@ -127,7 +139,7 @@ def generateParts(dir, book):
         context = {}
         with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
             text = i.read()
-        context["content"] = mark_safe(markdown(text, ..., extras=["fenced-code-blocks"]))
+        context["content"] = mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "strike"]))
         xhtml = eng.render_to_string("template.xhtml", context = context)
         with open(os.path.join(dir, "OEBPS", "parts", part.name + ".xhtml"), "w") as f:
                 f.write(xhtml)
@@ -136,6 +148,12 @@ def generateParts(dir, book):
 def copyAssets(dir, theme):
     path = os.getcwd()
     shutil.copytree(os.path.join(path, "themes", theme, "assets"), os.path.join(dir, "OEBPS"))
+
+
+def copyImages(dir, book):
+    for root, dirs, files in os.walk(os.path.join(book.source_path, "images")):
+        for file in files:
+            shutil.copy(os.path.join(book.source_path, "images", file), os.path.join(dir, "OEBPS", "images"))
 
 
 def generateToc(dir, book):
