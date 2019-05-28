@@ -299,7 +299,6 @@ class MainWindow(QMainWindow):
         exit_icon = QIcon("./images/exit.png")
         bold_icon = QIcon("./images/bold.png")
         italic_icon = QIcon("./images/italic.png")
-        strike_icon = QIcon("./images/strike.png")
         image_icon = QIcon("./images/image.png")
         table_icon = QIcon("./images/table.png")
 
@@ -334,10 +333,6 @@ class MainWindow(QMainWindow):
         italic_act.setShortcut(Qt.CTRL + Qt.Key_I)
         italic_act.triggered.connect(self.italic)
 
-        strike_act = QAction(strike_icon, "Striketrough", self)
-        strike_act.setShortcut(Qt.CTRL + Qt.Key_S)
-        strike_act.triggered.connect(self.strike)
-
         image_act = QAction(image_icon, "Image", self)
         image_act.setShortcut(Qt.CTRL + Qt.Key_G)
         image_act.triggered.connect(self.insertImage)
@@ -362,7 +357,6 @@ class MainWindow(QMainWindow):
         format_menu = self.menuBar().addMenu("&Format")
         format_menu.addAction(bold_act)
         format_menu.addAction(italic_act)
-        format_menu.addAction(strike_act)
 
         insert_menu = self.menuBar().addMenu("&Insert")
         insert_menu.addAction(image_act)
@@ -379,7 +373,6 @@ class MainWindow(QMainWindow):
         format_tool_bar = self.addToolBar("Format")
         format_tool_bar.addAction(bold_act)
         format_tool_bar.addAction(italic_act)
-        format_tool_bar.addAction(strike_act)
 
         insert_toolbar = self.addToolBar("Insert")
         insert_toolbar.addAction(image_act)
@@ -509,18 +502,6 @@ class MainWindow(QMainWindow):
         cursor.setPosition(pos + 1)
         self.text_edit.setTextCursor(cursor)
 
-    def strike(self):
-        if not self.filename:
-            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to select part from the book content first!")
-            return
-        cursor = self.text_edit.textCursor()
-        pos = cursor.position()
-        if not cursor.hasSelection():
-            cursor.select(QTextCursor.WordUnderCursor)
-        cursor.insertText("~~" + cursor.selectedText() + "~~")
-        cursor.setPosition(pos + 2)
-        self.text_edit.setTextCursor(cursor)
-
     def textChanged(self):
         if self.filename:
             with open(self.filename, "w") as f:
@@ -530,9 +511,10 @@ class MainWindow(QMainWindow):
         html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "</head>\n<body>\n"
-        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "strike", "tables"]))
+        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "tables"]))
         html += "\n</body>\n</html>"
         self.preview.setHtml(html, baseUrl = QUrl(Path(path.join(self.book.source_path, "parts", "index.html")).as_uri()))
+        print(html)
 
     def create(self):
         filename = ""

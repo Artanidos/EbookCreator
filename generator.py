@@ -28,6 +28,7 @@ from markdown2 import markdown
 from django.template import Context, Engine
 from django.utils.safestring import mark_safe
 from zipfile import ZipFile
+from PyQt5.QtCore import QCoreApplication
 
 
 def createEpub(output, book, win):
@@ -91,6 +92,7 @@ def generatePackage(dir, book, uuid):
     context["lang"] = book.language
     context["title"] = book.name
     context["date"] = datetime.datetime.now().strftime("%Y-%m-%d")
+    context["version"] = QCoreApplication.applicationVersion()
     items = []
     spine = ["toc"]
     item = {}
@@ -139,7 +141,7 @@ def generateParts(dir, book):
         context = {}
         with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
             text = i.read()
-        context["content"] = mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "strike", "tables"]))
+        context["content"] = mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "tables"]))
         xhtml = eng.render_to_string("template.xhtml", context = context)
         with open(os.path.join(dir, "OEBPS", "parts", part.name + ".xhtml"), "w") as f:
                 f.write(xhtml)
