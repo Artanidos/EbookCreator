@@ -301,6 +301,7 @@ class MainWindow(QMainWindow):
         italic_icon = QIcon("./images/italic.png")
         strike_icon = QIcon("./images/strike.png")
         image_icon = QIcon("./images/image.png")
+        table_icon = QIcon("./images/table.png")
 
         new_act = QAction(new_icon, "&New", self)
         new_act.setShortcuts(QKeySequence.New)
@@ -342,6 +343,11 @@ class MainWindow(QMainWindow):
         image_act.triggered.connect(self.insertImage)
         image_act.setToolTip("Insert an image")
 
+        table_act = QAction(table_icon, "Table", self)
+        table_act.setShortcut(Qt.CTRL + Qt.Key_T)
+        table_act.triggered.connect(self.insertTable)
+        table_act.setToolTip("Insert a table")
+
         about_act = QAction("&About", self)
         about_act.triggered.connect(self.about)
         about_act.setStatusTip("Show the application's About box")
@@ -360,6 +366,7 @@ class MainWindow(QMainWindow):
 
         insert_menu = self.menuBar().addMenu("&Insert")
         insert_menu.addAction(image_act)
+        insert_menu.addAction(table_act)
 
         help_menu = self.menuBar().addMenu("&Help")
         help_menu.addAction(about_act)
@@ -376,6 +383,7 @@ class MainWindow(QMainWindow):
 
         insert_toolbar = self.addToolBar("Insert")
         insert_toolbar.addAction(image_act)
+        insert_toolbar.addAction(table_act)
 
     def insertImage(self):
         if not self.book:
@@ -396,6 +404,16 @@ class MainWindow(QMainWindow):
         cursor = self.text_edit.textCursor()
         pos = cursor.position()
         cursor.insertText("![AltText](../images/" + filename + " \"Title\")")
+        cursor.setPosition(pos)
+        self.text_edit.setTextCursor(cursor)
+
+    def insertTable(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        cursor.insertText("| alignLeft | alignCenter | unAligned | alignRight |\n"
+                          "|  :---     |   :---:     |   ---     |   ---:     |\n"
+                          "|  cell a   |   cell b    |   cell c  |   cell d   |\n"
+                          "|  cell e   |   cell f    |   cell g  |   cell h   |\n")
         cursor.setPosition(pos)
         self.text_edit.setTextCursor(cursor)
 
@@ -508,11 +526,13 @@ class MainWindow(QMainWindow):
             with open(self.filename, "w") as f:
                 f.write(self.text_edit.toPlainText())
 
-        html = "<html><head></head><link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/><body>"
-        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "strike"]))
-        html += "</body></html>"
+        html = "<html>\n<head>\n"
+        html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+        html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+        html += "</head>\n<body>\n"
+        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "strike", "tables"]))
+        html += "\n</body>\n</html>"
         self.preview.setHtml(html, baseUrl = QUrl(Path(path.join(self.book.source_path, "parts", "index.html")).as_uri()))
-        print(html)
 
     def create(self):
         filename = ""

@@ -139,7 +139,7 @@ def generateParts(dir, book):
         context = {}
         with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
             text = i.read()
-        context["content"] = mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "strike"]))
+        context["content"] = mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "strike", "tables"]))
         xhtml = eng.render_to_string("template.xhtml", context = context)
         with open(os.path.join(dir, "OEBPS", "parts", part.name + ".xhtml"), "w") as f:
                 f.write(xhtml)
