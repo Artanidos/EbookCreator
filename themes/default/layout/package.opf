@@ -4,8 +4,9 @@
     <dc:identifier id="BookId" opf:scheme="UUID">urn:uuid:{{ uuid }}</dc:identifier>
     <dc:language>{{ lang }}</dc:language>
     <dc:title>{{ title }}</dc:title>
-    <dc:creator>Creator</dc:creator>
-    <dc:publisher>Publisher</dc:publisher>
+    <dc:creator opf:role="aut">{{ creator }}</dc:creator>
+    <dc:publisher>{{ publisher }}</dc:publisher>
+    <dc:rights>All rights reserved</dc:rights>
     <meta name="EbookCreator version" content="{{ version }}" />
     <dc:date opf:event="modification" xmlns:opf="http://www.idpf.org/2007/opf">{{ date }}</dc:date>
   </metadata>

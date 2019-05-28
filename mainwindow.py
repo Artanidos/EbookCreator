@@ -514,7 +514,6 @@ class MainWindow(QMainWindow):
         html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "tables"]))
         html += "\n</body>\n</html>"
         self.preview.setHtml(html, baseUrl = QUrl(Path(path.join(self.book.source_path, "parts", "index.html")).as_uri()))
-        print(html)
 
     def create(self):
         filename = ""
