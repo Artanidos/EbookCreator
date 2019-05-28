@@ -217,6 +217,7 @@ class MainWindow(QMainWindow):
         for root, dir, files in walk(path.join(self.book.source_path, "images")):
             for file in files:
                 item = QListWidgetItem()
+                item.setToolTip("Doubleclick image to insert")
                 item.setText(Path(file).name)
                 item.setData(1, path.join(self.book.source_path, "images", Path(file).name))
                 self.image_list.addItem(item)
