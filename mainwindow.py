@@ -22,20 +22,29 @@ import sys
 from os import path, remove, walk
 from pathlib import Path
 from shutil import copy
-from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QDockWidget, QScrollArea, QSizePolicy, QHBoxLayout, QVBoxLayout, QMainWindow, QSplitter, QListWidget, QListWidgetItem, QTextEdit, QAction, QMessageBox, QFileDialog, QDialog, QStyleFactory
-from PyQt5.QtCore import Qt, QCoreApplication, QSettings, QByteArray, QUrl, QPropertyAnimation
-from PyQt5.QtGui import QIcon, QKeySequence, QFont, QPalette, QColor, QTextCursor
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtQml import QQmlEngine, QQmlComponent
-from markdown2 import markdown
+
 from django.utils.safestring import mark_safe
-from projectwizard import ProjectWizard
+from markdown2 import markdown
+from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
+                          QSettings, Qt, QUrl)
+from PyQt5.QtGui import (QColor, QFont, QIcon, QKeySequence, QPalette,
+                         QTextCursor)
+from PyQt5.QtQml import QQmlComponent, QQmlEngine
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QDockWidget,
+                             QFileDialog, QHBoxLayout, QLineEdit, QListWidget,
+                             QListWidgetItem, QMainWindow, QMessageBox,
+                             QScrollArea, QSizePolicy, QSplitter,
+                             QStyleFactory, QTextEdit, QVBoxLayout, QWidget)
+
+from ebook import Ebook
 from expander import Expander
 from flatbutton import FlatButton
-from hyperlink import HyperLink
-from ebook import Ebook
-from markdownedit import MarkdownEdit
 from generator import createEpub
+from hyperlink import HyperLink
+from markdownedit import MarkdownEdit
+from projectwizard import ProjectWizard
+from settings import Settings
 
 
 class MainWindow(QMainWindow):
@@ -58,14 +67,14 @@ class MainWindow(QMainWindow):
     def createUi(self):
         self.content = Expander("Content", "./images/parts_normal.png", "./images/parts_hover.png", "./images/parts_selected.png")
         self.images = Expander("Images", "./images/images_normal.png", "./images/images_hover.png", "./images/images_selected.png")
-        self.appearance = Expander("Appearance", "./images/appearance_normal.png", "./images/appearance_hover.png", "./images/appearance_selected.png")
+        # self.appearance = Expander("Appearance", "./images/appearance_normal.png", "./images/appearance_hover.png", "./images/appearance_selected.png")
         self.settings = Expander("Settings", "./images/settings_normal.png", "./images/settings_hover.png", "./images/settings_selected.png")
 
         self.setWindowTitle(QCoreApplication.applicationName() + " " + QCoreApplication.applicationVersion())
         vbox = QVBoxLayout()
         vbox.addWidget(self.content)
         vbox.addWidget(self.images)
-        vbox.addWidget(self.appearance)
+        # vbox.addWidget(self.appearance)
         vbox.addWidget(self.settings)
         vbox.addStretch()
 
@@ -112,15 +121,15 @@ class MainWindow(QMainWindow):
         image_plus_button.clicked.connect(self.addImage)
         self.image_trash_button.clicked.connect(self.dropImage)
 
-        app_box = QVBoxLayout()
-        themes_button = HyperLink("Themes")
-        menus_button = HyperLink("Menus")
-        self.theme_settings_button = HyperLink("Theme Settings")
-        self.theme_settings_button.setVisible(False)
-        app_box.addWidget(menus_button)
-        app_box.addWidget(themes_button)
-        app_box.addWidget(self.theme_settings_button)
-        self.appearance.addLayout(app_box)
+        # app_box = QVBoxLayout()
+        # themes_button = HyperLink("Themes")
+        # menus_button = HyperLink("Menus")
+        # self.theme_settings_button = HyperLink("Theme Settings")
+        # self.theme_settings_button.setVisible(False)
+        # app_box.addWidget(menus_button)
+        # app_box.addWidget(themes_button)
+        # app_box.addWidget(self.theme_settings_button)
+        # self.appearance.addLayout(app_box)
 
         scroll_content = QWidget()
         scroll_content.setLayout(vbox)
@@ -143,7 +152,7 @@ class MainWindow(QMainWindow):
         self.text_edit.setFont(QFont("Courier", 11))
         self.preview = QWebEngineView()
         self.preview.setMinimumWidth(300)
-        self.setWindowTitle(QCoreApplication.applicationName() + "[*]")
+        self.setWindowTitle(QCoreApplication.applicationName())
 
         self.splitter.addWidget(self.text_edit)
         self.splitter.addWidget(self.preview)
@@ -151,11 +160,18 @@ class MainWindow(QMainWindow):
 
         self.content.expanded.connect(self.contentExpanded)
         self.images.expanded.connect(self.imagesExpanded)
-        self.appearance.expanded.connect(self.appearanceExpanded)
+        # self.appearance.expanded.connect(self.appearanceExpanded)
         self.settings.expanded.connect(self.settingsExpanded)
+        self.settings.clicked.connect(self.openSettings)
         self.content_list.currentItemChanged.connect(self.partSelectionChanged)
         self.image_list.currentItemChanged.connect(self.imageSelectionChanged)
         self.image_list.itemDoubleClicked.connect(self.insertImage)
+
+    def openSettings(self):
+        dlg = Settings(self.book)
+        dlg.exec()
+        if dlg.saved:
+            self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
 
     def addPart(self):
         self.item_edit.setText("")
@@ -250,13 +266,13 @@ class MainWindow(QMainWindow):
     def contentExpanded(self, value):
         if value:
             self.images.setExpanded(False)
-            self.appearance.setExpanded(False)
+            # self.appearance.setExpanded(False)
             self.settings.setExpanded(False)
 
     def imagesExpanded(self, value):
         if value:
             self.content.setExpanded(False)
-            self.appearance.setExpanded(False)
+            # self.appearance.setExpanded(False)
             self.settings.setExpanded(False)
 
     def appearanceExpanded(self, value):
@@ -269,7 +285,7 @@ class MainWindow(QMainWindow):
         if value:
             self.content.setExpanded(False)
             self.images.setExpanded(False)
-            self.appearance.setExpanded(False)
+            # self.appearance.setExpanded(False)
 
     def closeEvent(self, event):
         self.writeSettings()
