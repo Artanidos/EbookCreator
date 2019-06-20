@@ -18,16 +18,17 @@
 #
 #############################################################################
 
+import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
-from PyQt5.QtCore import QParallelAnimationGroup, QPropertyAnimation, Qt, pyqtProperty, pyqtSignal
-from PyQt5.QtGui import QImage, QPalette, QPixmap, QColor
+from PyQt5.QtCore import QParallelAnimationGroup, QPropertyAnimation, Qt, pyqtProperty, pyqtSignal, QDir
+from PyQt5.QtGui import QImage, QPalette, QPixmap, QColor, QIcon
 
 
 class Expander(QWidget):
     expanded = pyqtSignal(object)
     clicked = pyqtSignal()
 
-    def __init__(self, header, normal_icon = "", hovered_icon = "", selected_icon = ""):
+    def __init__(self, header, svg):
         QWidget.__init__(self)
         self.is_expanded = False
         self.text = header
@@ -40,12 +41,9 @@ class Expander(QWidget):
 
         self.setCursor(Qt.PointingHandCursor)
 
-        if normal_icon:
-            self.normal_icon = QImage(normal_icon)
-        if hovered_icon:
-            self.hovered_icon = QImage(hovered_icon)
-        if selected_icon:
-            self.selected_icon = QImage(selected_icon)
+        self.normal_icon = QPixmap(self.createIcon(svg, self.label_normal_color))
+        self.hovered_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
+        self.selected_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
 
         self.setAttribute(Qt.WA_Hover, True)
 
@@ -55,7 +53,7 @@ class Expander(QWidget):
         vbox = QVBoxLayout()
         hbox = QHBoxLayout()
         self.icon = QLabel()
-        self.icon.setPixmap(QPixmap.fromImage(self.normal_icon))
+        self.icon.setPixmap(self.normal_icon)
         self.hyper = QLabel()
         self.hyper.setText("<a style=\"color: " + self.label_normal_color + " text-decoration: none\" href=\"#\">" + self.text + "</a>")
         hbox.addWidget(self.icon)
@@ -80,6 +78,16 @@ class Expander(QWidget):
         self.anim.addAnimation(self.height_anim)
         self.anim.addAnimation(self.color_anim)
 
+    def createIcon(self, source, hilite_color):
+        temp = QDir.tempPath()
+        with open(source, "r") as fp:
+            data = fp.read()
+        
+        out = os.path.join(temp, hilite_color + ".svg")
+        with open(out, "w") as fp:
+            fp.write(data.replace("#ff00ff", hilite_color))
+        return out
+
     def setExpanded(self, value):
         if value == self.is_expanded:
             return
@@ -89,14 +97,14 @@ class Expander(QWidget):
             pal = self.palette()
             pal.setColor(QPalette.Background, self.selected_color)
             self.setPalette(pal)
-            self.icon.setPixmap(QPixmap.fromImage(self.selected_icon))
+            self.icon.setPixmap(self.selected_icon)
             self.hyper.setText("<a style=\"color: " + self.label_selected_color + "; text-decoration: none;\" href=\"#\">" + self.text + "</a>")
         else:
             self.is_expanded = False
             pal = self.palette()
             pal.setColor(QPalette.Background, QColor(self.normal_color))
             self.setPalette(pal)
-            self.icon.setPixmap(QPixmap.fromImage(self.normal_icon))
+            self.icon.setPixmap(self.normal_icon)
             self.hyper.setText("<a style=\"color: " + self.label_normal_color + "; text-decoration: none;\" href=\"#\">" + self.text + "</a>")
 
         if self.is_expanded:
@@ -153,7 +161,7 @@ class Expander(QWidget):
             pal = self.palette()
             pal.setColor(QPalette.Background, QColor(self.hovered_color))
             self.setPalette(pal)
-            self.icon.setPixmap(QPixmap.fromImage(self.hovered_icon))
+            self.icon.setPixmap(self.hovered_icon)
             self.hyper.setText("<a style=\"color: " + self.label_hovered_color + "; text-decoration: none;\" href=\"#\">" + self.text + "</a>")
         QWidget.enterEvent(self, event)
 
@@ -162,6 +170,6 @@ class Expander(QWidget):
             pal = self.palette()
             pal.setColor(QPalette.Background, QColor(self.normal_color))
             self.setPalette(pal)
-            self.icon.setPixmap(QPixmap.fromImage(self.normal_icon))
+            self.icon.setPixmap(self.normal_icon)
             self.hyper.setText("<a style=\"color: " + self.label_normal_color + "; text-decoration: none;\" href=\"#\">" + self.text + "</a>")
         QWidget.leaveEvent(self, event)

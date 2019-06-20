@@ -18,8 +18,9 @@
 #
 #############################################################################
 
+import os
 from PyQt5.QtWidgets import QLabel, QWidget
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty, QDir
 from PyQt5.QtGui import QPixmap, QImage
 
 
@@ -27,42 +28,34 @@ class FlatButton(QLabel):
     clickedWithReturn = pyqtSignal(object)
     clicked = pyqtSignal()
 
-    def __init__(self):
-        self._enabled = True
-        self.returncode = ""
-        self.setCursor(Qt.PointingHandCursor)
-
-    def __init__(self, normal_icon, hover_icon, pressed_icon="", disabled_icon=""):
+    def __init__(self, svg):
         QLabel.__init__(self)
 
         self._enabled = True
         self.returncode = ""
-        if not normal_icon:
-            self.normal_icon = QPixmap.fromImage(QImage())
-        else:
-            self.normal_icon = QPixmap.fromImage(QImage(normal_icon))
 
-        if not hover_icon:
-            self.hover_icon = QPixmap.fromImage(QImage())
-        else:
-            self.hover_icon = QPixmap.fromImage(QImage(hover_icon))
+        self.label_normal_color = self.palette().link().color().name()
+        self.label_hovered_color = self.palette().highlight().color().name()
+        #self.label_disabled_color = self.palette().dis.color().name()
 
-        if not pressed_icon:
-            self.pressed_icon = QPixmap.fromImage(QImage(hover_icon))
-        else:
-            self.pressed_icon = QPixmap.fromImage(QImage(pressed_icon))
-
-        if not disabled_icon:
-            self.disabled_icon = QPixmap.fromImage(QImage(normal_icon))
-        else:
-            self.disabled_icon = QPixmap.fromImage(QImage(disabled_icon))
+        self.normal_icon = QPixmap(self.createIcon(svg, self.label_normal_color))
+        self.hover_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
+        self.disabled_icon = QPixmap(self.createIcon(svg, "#999999"))
 
         self.setPixmap(self.normal_icon)
         self.setCursor(Qt.PointingHandCursor)
 
+    def createIcon(self, source, hilite_color):
+        temp = QDir.tempPath()
+        with open(source, "r") as fp:
+            data = fp.read()
+        
+        out = os.path.join(temp, hilite_color + ".svg")
+        with open(out, "w") as fp:
+            fp.write(data.replace("#ff00ff", hilite_color))
+        return out
+
     def mousePressEvent(self, event):
-        if self.enabled:
-            self.setPixmap(self.pressed_icon)
         self.setFocus()
         event.accept()
 

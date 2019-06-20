@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="25.447708"
+   height="25.447466"
+   viewBox="0 0 6.7330394 6.7329754"
+   version="1.1"
+   id="svg2706"
+   inkscape:version="0.92.4 (unknown)"
+   sodipodi:docname="plus.svg">
+  <defs
+     id="defs2700" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="17.673289"
+     inkscape:cx="12.694298"
+     inkscape:cy="13.674553"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1600"
+     inkscape:window-height="832"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata2703">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Background"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(172.57823,-23.566396)">
+    <g
+       id="g5653-9"
+       transform="matrix(0.17024819,0.17024819,-0.17024819,0.17024819,-169.21161,22.172)">
+      <g
+         id="c142_x-1">
+        <path
+           style="fill:#333333"
+           inkscape:connector-curvature="0"
+           d="M 13.98,0 C 6.259,0 0,6.261 0,13.983 c 0,7.721 6.259,13.982 13.98,13.982 7.725,0 13.985,-6.262 13.985,-13.982 C 27.965,6.261 21.705,0 13.98,0 Z"
+           id="path5656-2"
+           sodipodi:nodetypes="sssss" />
+      </g>
+      <g
+         id="Capa_1_104_-7" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Hilite">
+    <path
+       style="opacity:1;fill:#ff00ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.84701908;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 1.7060647,3.3668412 3.5e-4,-0.371123 0.21504,0.0073 c 0.35056,0.01191 0.98845,0.01222 1.034,4.97e-4 0.0412,-0.01061 0.0425,-0.01237 0.0516,-0.07344 0.0101,-0.06739 0.008,-0.682622 -0.003,-1.018381 l -0.007,-0.20584 h 0.37083 l 0.37083,-1e-6 -0.008,0.432727 c -0.009,0.460154 -0.003,0.836522 0.0122,0.852067 0.0197,0.01968 0.3344,0.02574 0.80094,0.01541 l 0.48383,-0.01071 -9e-5,0.371172 -10e-5,0.371172 -0.28873,-0.0081 c -0.5451,-0.01535 -0.96596,-0.0081 -0.99111,0.01704 -0.0254,0.0254 -0.0322,0.409936 -0.0172,0.972711 l 0.008,0.307221 -0.37047,2.8e-4 -0.37047,2.79e-4 0.007,-0.247351 c 0.0121,-0.423647 0.008,-1.016616 -0.008,-1.031885 -0.0311,-0.03106 -0.34182,-0.03436 -1.18642,-0.01259 l -0.10474,0.0027 z"
+       id="path5784-09"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

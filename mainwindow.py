@@ -65,10 +65,10 @@ class MainWindow(QMainWindow):
             self.loadBook(self.last_book)
 
     def createUi(self):
-        self.content = Expander("Content", "./images/parts_normal.png", "./images/parts_hover.png", "./images/parts_selected.png")
-        self.images = Expander("Images", "./images/images_normal.png", "./images/images_hover.png", "./images/images_selected.png")
+        self.content = Expander("Content", "./images/parts.svg")
+        self.images = Expander("Images", "./images/images.svg")
         # self.appearance = Expander("Appearance", "./images/appearance_normal.png", "./images/appearance_hover.png", "./images/appearance_selected.png")
-        self.settings = Expander("Settings", "./images/settings_normal.png", "./images/settings_hover.png", "./images/settings_selected.png")
+        self.settings = Expander("Settings", "./images/settings.svg")
 
         self.setWindowTitle(QCoreApplication.applicationName() + " " + QCoreApplication.applicationVersion())
         vbox = QVBoxLayout()
@@ -88,10 +88,10 @@ class MainWindow(QMainWindow):
         self.item_anim = QPropertyAnimation(self.item_edit, "maximumHeight".encode("utf-8"))
         content_box.addWidget(self.item_edit)
         button_layout = QHBoxLayout()
-        plus_button = FlatButton("./images/plus_normal.png", "./images/plus_hover.png")
-        self.trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png", disabled_icon = "./images/trash_disabled.png")
-        self.up_button = FlatButton("./images/up_normal.png", "./images/up_hover.png", disabled_icon = "./images/up_disabled.png")
-        self.down_button = FlatButton("./images/down_normal.png", "./images/down_hover.png", disabled_icon = "./images/down_disabled.png")
+        plus_button = FlatButton("./images/plus.svg")
+        self.trash_button = FlatButton("./images/trash.svg")
+        self.up_button = FlatButton("./images/up.svg")
+        self.down_button = FlatButton("./images/down.svg")
         self.trash_button.enabled = False
         self.up_button.enabled = False
         self.down_button.enabled = False
@@ -111,8 +111,8 @@ class MainWindow(QMainWindow):
         image_box = QVBoxLayout()
         image_box.addWidget(self.image_list)
         image_button_layout = QHBoxLayout()
-        image_plus_button = FlatButton("./images/plus_normal.png", "./images/plus_hover.png")
-        self.image_trash_button = FlatButton("./images/trash_normal.png", "./images/trash_hover.png", disabled_icon = "./images/trash_disabled.png")
+        image_plus_button = FlatButton("./images/plus.svg")
+        self.image_trash_button = FlatButton("./images/trash.svg")
         self.image_trash_button.enabled = False
         image_button_layout.addWidget(image_plus_button)
         image_button_layout.addWidget(self.image_trash_button)
@@ -293,14 +293,13 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def createMenus(self):
-        new_icon = QIcon("./images/new.png")
-        open_icon = QIcon("./images/open.png")
-        book_icon = QIcon("./images/book.png")
-        exit_icon = QIcon("./images/exit.png")
-        bold_icon = QIcon("./images/bold.png")
-        italic_icon = QIcon("./images/italic.png")
-        image_icon = QIcon("./images/image.png")
-        table_icon = QIcon("./images/table.png")
+        new_icon = QIcon(QPixmap("./images/new.svg"))
+        open_icon = QIcon(QPixmap("./images/open.svg"))
+        book_icon = QIcon(QPixmap("./images/book.svg"))
+        bold_icon = QIcon(QPixmap("./images/bold.svg"))
+        italic_icon = QIcon(QPixmap("./images/italic.svg"))
+        image_icon = QIcon(QPixmap("./images/image.svg"))
+        table_icon = QIcon(QPixmap("./images/table.svg"))
 
         new_act = QAction(new_icon, "&New", self)
         new_act.setShortcuts(QKeySequence.New)
@@ -320,7 +319,7 @@ class MainWindow(QMainWindow):
         book_act.triggered.connect(self.create)
         book_act.setToolTip("Create an ebook")
 
-        exit_act = QAction(exit_icon, "E&xit", self)
+        exit_act = QAction("E&xit", self)
         exit_act.setShortcuts(QKeySequence.Quit)
         exit_act.setStatusTip("Exit the application")
         exit_act.triggered.connect(self.close)
