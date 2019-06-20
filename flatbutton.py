@@ -21,7 +21,7 @@
 import os
 from PyQt5.QtWidgets import QLabel, QWidget
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty, QDir
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtGui import QPixmap, QImage, QPalette
 
 
 class FlatButton(QLabel):
@@ -34,25 +34,26 @@ class FlatButton(QLabel):
         self._enabled = True
         self.returncode = ""
 
-        self.label_normal_color = self.palette().link().color().name()
+        self.label_normal_color = self.palette().buttonText().color().name()
         self.label_hovered_color = self.palette().highlight().color().name()
-        #self.label_disabled_color = self.palette().dis.color().name()
+        self.label_disabled_color = self.palette().color(QPalette.Disabled, QPalette.ButtonText).name()
 
         self.normal_icon = QPixmap(self.createIcon(svg, self.label_normal_color))
         self.hover_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
-        self.disabled_icon = QPixmap(self.createIcon(svg, "#999999"))
+        self.disabled_icon = QPixmap(self.createIcon(svg, self.label_disabled_color))
 
         self.setPixmap(self.normal_icon)
         self.setCursor(Qt.PointingHandCursor)
 
     def createIcon(self, source, hilite_color):
+        bg = self.palette().button().color().name()
         temp = QDir.tempPath()
         with open(source, "r") as fp:
             data = fp.read()
-        
+
         out = os.path.join(temp, hilite_color + ".svg")
         with open(out, "w") as fp:
-            fp.write(data.replace("#ff00ff", hilite_color))
+            fp.write(data.replace("#ff00ff", hilite_color).replace("#0000ff", bg))
         return out
 
     def mousePressEvent(self, event):

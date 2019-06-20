@@ -41,7 +41,7 @@ class Expander(QWidget):
 
         self.setCursor(Qt.PointingHandCursor)
 
-        self.normal_icon = QPixmap(self.createIcon(svg, self.label_normal_color))
+        self.normal_icon = QPixmap(self.createIcon(svg, self.palette().button().color().name()))
         self.hovered_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
         self.selected_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
 
@@ -82,7 +82,7 @@ class Expander(QWidget):
         temp = QDir.tempPath()
         with open(source, "r") as fp:
             data = fp.read()
-        
+
         out = os.path.join(temp, hilite_color + ".svg")
         with open(out, "w") as fp:
             fp.write(data.replace("#ff00ff", hilite_color))

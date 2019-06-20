@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="6.2192308"
-     inkscape:cx="-8.5714286"
+     inkscape:cx="-47.322201"
      inkscape:cy="27.142857"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,64 +57,64 @@
     <g
        id="g5069-6-3-5"
        transform="matrix(0,-0.01312178,-0.01334616,0,7.0156332,297.49448)"
-       style="fill:#333333;fill-opacity:1"
+       style="fill:#0000ff;fill-opacity:1"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90">
       <g
          id="g5029-3-7-6-4"
-         style="fill:#333333;fill-opacity:1">
+         style="fill:#0000ff;fill-opacity:1">
         <path
            id="path5031-5-7-7"
            d="m 289.7395,21.858355 c -141.391,0 -255.999999,114.625005 -255.999999,256.000005 0,141.375 114.608999,256 255.999999,256 141.359,0 255.984,-114.625 255.984,-256 0,-141.375 -114.625,-256.000005 -255.984,-256.000005 z"
            inkscape:connector-curvature="0"
-           style="fill:#333333;fill-opacity:1"
+           style="fill:#0000ff;fill-opacity:1"
            sodipodi:nodetypes="sssss" />
       </g>
       <g
          id="g5033-3-5-6"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5035-5-3-5"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5037-6-5-6"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5039-2-6-9"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5041-9-2-3"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5043-1-9-7"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5045-2-1-4"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5047-7-2-52"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5049-0-7-5"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5051-9-0-4"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5053-3-9-7"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5055-6-3-4"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5057-0-6-4"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5059-6-0-3"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
       <g
          id="g5061-2-6-07"
-         style="fill:#333333;fill-opacity:1" />
+         style="fill:#0000ff;fill-opacity:1" />
     </g>
     <path
        style="opacity:1;fill:#ff00ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.79022223;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
