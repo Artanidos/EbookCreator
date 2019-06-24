@@ -19,9 +19,9 @@
 #############################################################################
 
 import os
-from PyQt5.QtWidgets import QLabel, QWidget
+from PyQt5.QtWidgets import QLabel, QWidget, QStyleOption, QStyle
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty, QDir
-from PyQt5.QtGui import QPixmap, QImage, QPalette
+from PyQt5.QtGui import QPixmap, QImage, QPalette, QPainter
 
 
 class FlatButton(QLabel):
@@ -30,20 +30,22 @@ class FlatButton(QLabel):
 
     def __init__(self, svg):
         QLabel.__init__(self)
-
+        self.svg = svg
         self._enabled = True
         self.returncode = ""
+        self.setColors()
+        self.setCursor(Qt.PointingHandCursor)
 
+    def setColors(self):
         self.label_normal_color = self.palette().buttonText().color().name()
         self.label_hovered_color = self.palette().highlight().color().name()
         self.label_disabled_color = self.palette().color(QPalette.Disabled, QPalette.ButtonText).name()
 
-        self.normal_icon = QPixmap(self.createIcon(svg, self.label_normal_color))
-        self.hover_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
-        self.disabled_icon = QPixmap(self.createIcon(svg, self.label_disabled_color))
+        self.normal_icon = QPixmap(self.createIcon(self.svg, self.label_normal_color))
+        self.hover_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
+        self.disabled_icon = QPixmap(self.createIcon(self.svg, self.label_disabled_color))
 
         self.setPixmap(self.normal_icon)
-        self.setCursor(Qt.PointingHandCursor)
 
     def createIcon(self, source, hilite_color):
         bg = self.palette().button().color().name()

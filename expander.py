@@ -30,32 +30,19 @@ class Expander(QWidget):
 
     def __init__(self, header, svg):
         QWidget.__init__(self)
+        self.svg = svg
         self.is_expanded = False
         self.text = header
-        self.label_normal_color = self.palette().link().color().name()
-        self.label_hovered_color = self.palette().highlight().color().name()
-        self.label_selected_color = self.palette().highlightedText().color().name()
-        self.normal_color = self.palette().base().color().name()
-        self.selected_color = self.palette().highlight().color()
-        self.hovered_color = self.palette().alternateBase().color()
-
+        self.icon = QLabel()
+        self.hyper = QLabel()
+        self.setColors()
         self.setCursor(Qt.PointingHandCursor)
-
-        self.normal_icon = QPixmap(self.createIcon(svg, self.palette().button().color().name()))
-        self.hovered_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
-        self.selected_icon = QPixmap(self.createIcon(svg, self.label_hovered_color))
-
         self.setAttribute(Qt.WA_Hover, True)
-
-        self.color = self.normal_color
         self.setAutoFillBackground(True)
 
         vbox = QVBoxLayout()
         hbox = QHBoxLayout()
-        self.icon = QLabel()
-        self.icon.setPixmap(self.normal_icon)
-        self.hyper = QLabel()
-        self.hyper.setText("<a style=\"color: " + self.label_normal_color + " text-decoration: none\" href=\"#\">" + self.text + "</a>")
+
         hbox.addWidget(self.icon)
         hbox.addSpacing(5)
         hbox.addWidget(self.hyper)
@@ -77,6 +64,23 @@ class Expander(QWidget):
         self.color_anim.setDuration(200)
         self.anim.addAnimation(self.height_anim)
         self.anim.addAnimation(self.color_anim)
+
+    def setColors(self):
+        self.label_normal_color = self.palette().link().color().name()
+        self.label_hovered_color = self.palette().highlight().color().name()
+        self.label_selected_color = self.palette().highlightedText().color().name()
+        self.normal_color = self.palette().base().color().name()
+        self.selected_color = self.palette().highlight().color()
+        self.hovered_color = self.palette().alternateBase().color()
+
+        self.normal_icon = QPixmap(self.createIcon(self.svg, self.palette().button().color().name()))
+        self.hovered_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
+        self.selected_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
+
+        self.icon.setPixmap(self.normal_icon)
+        self.color = self.normal_color
+
+        self.hyper.setText("<a style=\"color: " + self.label_normal_color + " text-decoration: none\" href=\"#\">" + self.text + "</a>")
 
     def createIcon(self, source, hilite_color):
         temp = QDir.tempPath()

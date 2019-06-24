@@ -34,8 +34,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QDockWidget,
                              QFileDialog, QHBoxLayout, QLineEdit, QListWidget,
                              QListWidgetItem, QMainWindow, QMessageBox,
-                             QScrollArea, QSizePolicy, QSplitter,
-                             QStyleFactory, QTextEdit, QVBoxLayout, QWidget)
+                             QScrollArea, QSizePolicy, QSplitter, QProxyStyle,
+                             QStyleFactory, QTextEdit, QVBoxLayout, QWidget, QStyle)
 
 from ebook import Ebook
 from expander import Expander
@@ -45,6 +45,7 @@ from hyperlink import HyperLink
 from markdownedit import MarkdownEdit
 from projectwizard import ProjectWizard
 from settings import Settings
+from dark import DarkFusion
 
 
 class MainWindow(QMainWindow):
@@ -54,7 +55,6 @@ class MainWindow(QMainWindow):
         self.book = None
         self.last_book = ""
         self.filename = ""
-
         self.createUi()
         self.createMenus()
         self.createStatusBar()
@@ -63,6 +63,14 @@ class MainWindow(QMainWindow):
 
         if self.last_book:
             self.loadBook(self.last_book)
+
+        self.changeStyle("Dark")
+
+    def changeStyle(self, style):
+        if style == "Dark":
+            QApplication.setStyle(DarkFusion())
+        else:
+            QApplication.setStyle(QStyleFactory.create(style))
 
     def createUi(self):
         self.content = Expander("Content", "./images/parts.svg")
