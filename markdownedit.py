@@ -19,12 +19,15 @@
 #############################################################################
 
 from PyQt5.QtWidgets import QTextEdit
+from mdhiliter import MdHiLiter
 
 
 class MarkdownEdit(QTextEdit):
 
     def __init__(self, parent = None):
         QTextEdit.__init__(self)
+
+        self.highlighter = MdHiLiter(self.document())
 
     def insertFromMimeData(self, data):
         if data.hasText():
