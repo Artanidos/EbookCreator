@@ -45,7 +45,10 @@ class FlatButton(QLabel):
         self.hover_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
         self.disabled_icon = QPixmap(self.createIcon(self.svg, self.label_disabled_color))
 
-        self.setPixmap(self.normal_icon)
+        if self.enabled:
+            self.setPixmap(self.normal_icon)
+        else:
+            self.setPixmap(self.disabled_icon)
 
     def createIcon(self, source, hilite_color):
         bg = self.palette().button().color().name()
@@ -79,6 +82,8 @@ class FlatButton(QLabel):
     def leaveEvent(self, event):
         if self.enabled:
             self.setPixmap(self.normal_icon)
+        else:
+            self.setPixmap(self.disabled_icon)
         QWidget.leaveEvent(self, event)
 
     @pyqtProperty(bool)

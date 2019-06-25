@@ -18,7 +18,7 @@
 #
 #############################################################################
 
-from PyQt5.QtWidgets import QProxyStyle, QStyleFactory, QApplication
+from PyQt5.QtWidgets import QProxyStyle, QStyleFactory, QApplication, QListWidget
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
 from flatbutton import FlatButton
@@ -47,7 +47,7 @@ class DarkFusion(QProxyStyle):
             palette.setColor(QPalette.HighlightedText, Qt.black)
             palette.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
             palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
-            palette.setColor(QPalette.Link, QColor("#bbb"))
+            palette.setColor(QPalette.Link, QColor("#bbbbbb"))
             return palette
         elif isinstance(arg, FlatButton):
             arg.setColors()

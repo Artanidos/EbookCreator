@@ -73,7 +73,7 @@ class Expander(QWidget):
         self.selected_color = self.palette().highlight().color()
         self.hovered_color = self.palette().alternateBase().color()
 
-        self.normal_icon = QPixmap(self.createIcon(self.svg, self.palette().button().color().name()))
+        self.normal_icon = QPixmap(self.createIcon(self.svg, self.label_normal_color))
         self.hovered_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
         self.selected_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
 

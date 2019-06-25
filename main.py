@@ -39,7 +39,6 @@ if __name__ == "__main__":
     QCoreApplication.setApplicationVersion("1.0.0")
 
     app.setStyle(QStyleFactory.create("Fusion"))
-    app.setStyleSheet("QPushButton:hover { color: #45bbe6 }")
 
     qmlRegisterType(Ebook, 'EbookCreator', 1, 0, 'Ebook')
     qmlRegisterType(Part, 'EbookCreator', 1, 0, 'Part')

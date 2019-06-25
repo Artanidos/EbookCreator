@@ -55,16 +55,16 @@ class MainWindow(QMainWindow):
         self.book = None
         self.last_book = ""
         self.filename = ""
+        self.changeStyle("Dark")
         self.createUi()
         self.createMenus()
         self.createStatusBar()
         self.readSettings()
         self.text_edit.textChanged.connect(self.textChanged)
 
+    def showEvent(self, event):
         if self.last_book:
             self.loadBook(self.last_book)
-
-        self.changeStyle("Dark")
 
     def changeStyle(self, style):
         if style == "Dark":
@@ -75,14 +75,12 @@ class MainWindow(QMainWindow):
     def createUi(self):
         self.content = Expander("Content", "./images/parts.svg")
         self.images = Expander("Images", "./images/images.svg")
-        # self.appearance = Expander("Appearance", "./images/appearance_normal.png", "./images/appearance_hover.png", "./images/appearance_selected.png")
         self.settings = Expander("Settings", "./images/settings.svg")
 
         self.setWindowTitle(QCoreApplication.applicationName() + " " + QCoreApplication.applicationVersion())
         vbox = QVBoxLayout()
         vbox.addWidget(self.content)
         vbox.addWidget(self.images)
-        # vbox.addWidget(self.appearance)
         vbox.addWidget(self.settings)
         vbox.addStretch()
 
@@ -129,16 +127,6 @@ class MainWindow(QMainWindow):
         image_plus_button.clicked.connect(self.addImage)
         self.image_trash_button.clicked.connect(self.dropImage)
 
-        # app_box = QVBoxLayout()
-        # themes_button = HyperLink("Themes")
-        # menus_button = HyperLink("Menus")
-        # self.theme_settings_button = HyperLink("Theme Settings")
-        # self.theme_settings_button.setVisible(False)
-        # app_box.addWidget(menus_button)
-        # app_box.addWidget(themes_button)
-        # app_box.addWidget(self.theme_settings_button)
-        # self.appearance.addLayout(app_box)
-
         scroll_content = QWidget()
         scroll_content.setLayout(vbox)
         scroll = QScrollArea()
@@ -168,7 +156,6 @@ class MainWindow(QMainWindow):
 
         self.content.expanded.connect(self.contentExpanded)
         self.images.expanded.connect(self.imagesExpanded)
-        # self.appearance.expanded.connect(self.appearanceExpanded)
         self.settings.expanded.connect(self.settingsExpanded)
         self.settings.clicked.connect(self.openSettings)
         self.content_list.currentItemChanged.connect(self.partSelectionChanged)
@@ -260,6 +247,8 @@ class MainWindow(QMainWindow):
             with open(self.filename, "r") as f:
                 self.text_edit.setText(f.read())
             self.trash_button.enabled = True
+            self.up_button.enabled = self.content_list.currentRow() > 0
+            self.down_button.enabled = self.content_list.currentRow() < self.content_list.count() - 1
         else:
             self.text_edit.setText("")
             self.trash_button.enabled = False
@@ -275,13 +264,11 @@ class MainWindow(QMainWindow):
     def contentExpanded(self, value):
         if value:
             self.images.setExpanded(False)
-            # self.appearance.setExpanded(False)
             self.settings.setExpanded(False)
 
     def imagesExpanded(self, value):
         if value:
             self.content.setExpanded(False)
-            # self.appearance.setExpanded(False)
             self.settings.setExpanded(False)
 
     def appearanceExpanded(self, value):
@@ -294,8 +281,7 @@ class MainWindow(QMainWindow):
         if value:
             self.content.setExpanded(False)
             self.images.setExpanded(False)
-            # self.appearance.setExpanded(False)
-
+    
     def closeEvent(self, event):
         self.writeSettings()
         event.accept()
@@ -428,31 +414,6 @@ class MainWindow(QMainWindow):
         dlg.loadBook.connect(self.loadBook)
         dlg.show()
 
-    def loadBook(self, filename):
-        self.last_book = filename
-        self.filename = ""
-        engine = QQmlEngine()
-        component = QQmlComponent(engine)
-        component.loadUrl(QUrl(filename))
-        self.book = component.create()
-        if self.book is not None:
-            self.book.setFilename(filename)
-            self.book.setWindow(self)
-        else:
-            for error in component.errors():
-                print(error.toString())
-                return
-
-        self.content_list.clear()
-        for part in self.book.parts:
-            item = QListWidgetItem()
-            item.setText(part.name)
-            item.setData(1, part)
-            self.content_list.addItem(item)
-
-        self.loadImages()
-        self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
-
     def open(self):
         fileName = ""
         dialog = QFileDialog()
@@ -540,3 +501,31 @@ class MainWindow(QMainWindow):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         createEpub(filename, self.book, self)
         QApplication.restoreOverrideCursor()
+
+    def loadBook(self, filename):
+        self.last_book = filename
+        self.filename = ""
+        engine = QQmlEngine()
+        component = QQmlComponent(engine)
+        component.loadUrl(QUrl(filename))
+        self.book = component.create()
+        if self.book is not None:
+            self.book.setFilename(filename)
+            self.book.setWindow(self)
+        else:
+            for error in component.errors():
+                print(error.toString())
+                return
+
+        self.content_list.clear()
+        for part in self.book.parts:
+            item = QListWidgetItem()
+            item.setText(part.name)
+            item.setData(1, part)
+            self.content_list.addItem(item)
+
+        self.loadImages()
+        self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
+
+        self.content.setExpanded(True)
+        self.content_list.setCurrentRow(0)
