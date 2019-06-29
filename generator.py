@@ -133,6 +133,19 @@ def generatePackage(dir, book, uuid):
         f.write(xml)
 
 
+def setAnchors(lines):
+    text = ""
+    for line in lines:
+        if not line:
+            continue
+        if line[0] == "#":
+            link = line.lstrip("#").replace(" ", "-").lower()
+            text += line + '<a name="' + link + '"/>  \n'
+        else:
+            text += line + "\n"
+    return text
+
+
 def generateParts(dir, book):
     path = os.getcwd()
     dirs = [
@@ -143,6 +156,7 @@ def generateParts(dir, book):
         context = {}
         with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
             text = i.read()
+        text = setAnchors(text.split("\n"))
         context["content"] = mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "tables"]))
         xhtml = eng.render_to_string("template.xhtml", context = context)
         with open(os.path.join(dir, "OEBPS", "parts", part.name + ".xhtml"), "w") as f:
@@ -160,6 +174,16 @@ def copyImages(dir, book):
             shutil.copy(os.path.join(book.source_path, "images", file), os.path.join(dir, "OEBPS", "images"))
 
 
+def getCaptions(lines):
+    list = []
+    for line in lines:
+        if not line:
+            continue
+        if line[0] == "#":
+            list.append(line.lstrip("#"))
+    return list
+
+
 def generateToc(dir, book):
     path = os.getcwd()
     parts = []
@@ -173,6 +197,15 @@ def generateToc(dir, book):
         item["href"] = part.name + ".xhtml"
         item["name"] = part.name
         parts.append(item)
+
+        with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
+            text = i.read()
+        list = getCaptions(text.split("\n"))
+        for l in list:
+            item = {}
+            item["href"] = part.name + ".xhtml#" + l.lower().replace(" ", "-")
+            item["name"] = l
+            parts.append(item)
 
     context["parts"] = parts
     dirs = [
