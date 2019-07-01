@@ -1,14 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title></title>
 </head>
 <body>
-<ol>{% for part in parts %}
-  <li><a href="{{ part.href }}">{{ part.name }}</a></li>{% endfor %}
-</ol>
+    <nav epub:type="toc" id="toc">
+    <h1>Table of Contents</h1>
+    <ul>
+      {% for a in parts %}
+      <li id="{{ a.id }}"><a href="{{ a.href }}">{{ a.name }}</a>
+        {% if a.parts %}
+        <ul>
+          {% for b in a.parts %}
+          <li><a href="{{ b.href }}">{{ b.name }}</a>
+            {% if b.parts %}
+            <ul>
+              {% for c in b.parts %}
+              <li><a href="{{ c.href }}">{{ c.name }}</a>
+                {% if c.parts %}
+                <ul>
+                  {% for d in c.parts %}
+                  <li><a href="{{ d.href }}">{{ d.name }}</a>
+                    {% if d.parts %}
+                    <ul>
+                      {% for e in d.parts %}
+                      <li><a href="{{ e.href }}">{{ e.name }}</a>
+                        {% if e.parts %}
+                        <ul>
+                          {% for f in e.parts %}
+                          <li><a href="{{ f.href }}">{{ f.name }}</a>
+                          </li>
+                          {% endfor %}
+                        </ul>
+                        {% endif %}
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    </nav>
 </body>
 </html>
