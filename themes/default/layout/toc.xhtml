@@ -1,57 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title></title>
-</head>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+	<head>
+		<meta charset="utf-8" />
+		<title>Table of Contents</title>
+		<link href="../css/stylesheet.css" rel="stylesheet" type="text/css"/>
+	</head>
+
 <body>
     <nav epub:type="toc" id="toc">
     <h1>Table of Contents</h1>
-    <ul>
+    <ol>
       {% for a in parts %}
       <li id="{{ a.id }}"><a href="{{ a.href }}">{{ a.name }}</a>
         {% if a.parts %}
-        <ul>
+        <ol>
           {% for b in a.parts %}
           <li><a href="{{ b.href }}">{{ b.name }}</a>
             {% if b.parts %}
-            <ul>
+            <ol>
               {% for c in b.parts %}
               <li><a href="{{ c.href }}">{{ c.name }}</a>
                 {% if c.parts %}
-                <ul>
+                <ol>
                   {% for d in c.parts %}
                   <li><a href="{{ d.href }}">{{ d.name }}</a>
                     {% if d.parts %}
-                    <ul>
+                    <ol>
                       {% for e in d.parts %}
                       <li><a href="{{ e.href }}">{{ e.name }}</a>
                         {% if e.parts %}
-                        <ul>
+                        <ol>
                           {% for f in e.parts %}
                           <li><a href="{{ f.href }}">{{ f.name }}</a>
                           </li>
                           {% endfor %}
-                        </ul>
+                        </ol>
                         {% endif %}
                       </li>
                       {% endfor %}
-                    </ul>
+                    </ol>
                     {% endif %}
                   </li>
                   {% endfor %}
-                </ul>
+                </ol>
                 {% endif %}
               </li>
               {% endfor %}
-            </ul>
+            </ol>
             {% endif %}
           </li>
           {% endfor %}
-        </ul>
+        </ol>
         {% endif %}
       </li>
       {% endfor %}
-    </ul>
+    </ol>
     </nav>
 </body>
 </html>
