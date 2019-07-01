@@ -127,17 +127,14 @@ def generatePackage(dir, book, uuid):
         f.write(xml)
 
 
-# def setAnchors(lines):
-#     text = ""
-#     for line in lines:
-#         if not line:
-#             continue
-#         if line[0] == "#":
-#             link = line.lstrip("#").strip().replace(" ", "-").lower()
-#             text += '<a href="#' + link + '"></a>\n' + line + "\n"
-#         else:
-#             text += line + "\n"
-#     return text
+def fixTables(text):
+    text = text.replace("<th align=\"center\"", "<th class=\"center\"")
+    text = text.replace("<th align=\"right\"", "<th class=\"right\"")
+    text = text.replace("<th align=\"left\"", "<th class=\"left\"")
+    text = text.replace("<td align=\"center\"", "<td class=\"center\"")
+    text = text.replace("<td align=\"right\"", "<td class=\"right\"")
+    text = text.replace("<td align=\"left\"", "<td class=\"left\"")
+    return text
 
 
 def generateParts(dir, book):
@@ -160,7 +157,7 @@ def generateParts(dir, book):
         list = getCaptions(text, part.name)
         for item in list:
             toc.append(item)
-        context["content"] = mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "tables", "header-ids"]))
+        context["content"] = mark_safe(fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"])))
         xhtml = eng.render_to_string("template.xhtml", context = context)
         with open(os.path.join(dir, "EPUB", "parts", part.name + ".xhtml"), "w") as f:
                 f.write(xhtml)

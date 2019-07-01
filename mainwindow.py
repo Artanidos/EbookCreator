@@ -281,7 +281,7 @@ class MainWindow(QMainWindow):
         if value:
             self.content.setExpanded(False)
             self.images.setExpanded(False)
-    
+
     def closeEvent(self, event):
         self.writeSettings()
         event.accept()
@@ -479,7 +479,7 @@ class MainWindow(QMainWindow):
         html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "</head>\n<body>\n"
-        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "tables"]))
+        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
         html += "\n</body>\n</html>"
         self.preview.setHtml(html, baseUrl = QUrl(Path(path.join(self.book.source_path, "parts", "index.html")).as_uri()))
 

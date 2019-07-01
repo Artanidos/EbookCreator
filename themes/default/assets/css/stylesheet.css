@@ -6,6 +6,30 @@ table {
     border-collapse: collapse;
   }
   
-  table, th, td {
+table, th, td {
     border: 1px solid black;
   }
+
+td.center {
+  text-align: center
+}
+
+td.right {
+  text-align: right
+}
+
+td.left {
+  text-align: left
+}
+
+th.center {
+  text-align: center
+}
+
+th.right {
+  text-align: right
+}
+
+th.left {
+  text-align: left
+}
