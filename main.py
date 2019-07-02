@@ -64,6 +64,6 @@ if __name__ == "__main__":
             os.mkdir(os.path.join(install_directory, "books"))
         del dlg
 
-    win = MainWindow(install_directory)
+    win = MainWindow(install_directory, app)
     win.show()
     sys.exit(app.exec_())

@@ -46,31 +46,43 @@ from markdownedit import MarkdownEdit
 from projectwizard import ProjectWizard
 from settings import Settings
 from dark import DarkFusion
+from settingsdialog import SettingsDialog
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, install_directory):
+    def __init__(self, install_directory, app):
         QMainWindow.__init__(self)
         self.install_directory = install_directory
+        self.app = app
         self.book = None
         self.last_book = ""
         self.filename = ""
-        self.changeStyle("Dark")
+        self.initTheme()
         self.createUi()
         self.createMenus()
         self.createStatusBar()
         self.readSettings()
         self.text_edit.textChanged.connect(self.textChanged)
 
+    def initTheme(self):
+        settings = QSettings(QSettings.IniFormat, QSettings.UserScope, QCoreApplication.organizationName(), QCoreApplication.applicationName())
+        self.theme = settings.value("theme", "Fusion")
+        hilite_color = settings.value("hiliteColor", self.palette().highlight().color().name())
+        self.changeStyle(self.theme, hilite_color)
+
     def showEvent(self, event):
         if self.last_book:
             self.loadBook(self.last_book)
 
-    def changeStyle(self, style):
-        if style == "Dark":
-            QApplication.setStyle(DarkFusion())
+    def changeStyle(self, theme, hilite_color):
+        self.theme = theme
+        if theme == "DarkFusion":
+            QApplication.setStyle(DarkFusion(hilite_color))
         else:
-            QApplication.setStyle(QStyleFactory.create(style))
+            QApplication.setStyle(QStyleFactory.create(theme))
+            pal = self.app.palette()
+            pal.setColor(QPalette.Highlight, QColor(hilite_color))
+            self.app.setPalette(pal)
 
     def createUi(self):
         self.content = Expander("Content", "./images/parts.svg")
@@ -235,10 +247,18 @@ class MainWindow(QMainWindow):
                 self.image_list.addItem(item)
 
     def partUp(self):
-        pass
+        pos = self.content_list.currentRow()
+        item = self.content_list.takeItem(pos)
+        self.content_list.insertItem(pos - 1, item)
+        self.content_list.setCurrentRow(pos - 1)
+        self.book.partUp(item.data(1).name)
 
     def partDown(self):
-        pass
+        pos = self.content_list.currentRow()
+        item = self.content_list.takeItem(pos)
+        self.content_list.insertItem(pos + 1, item)
+        self.content_list.setCurrentRow(pos + 1)
+        self.book.partDown(item.data(1).name)
 
     def partSelectionChanged(self, item):
         if item:
@@ -313,6 +333,11 @@ class MainWindow(QMainWindow):
         book_act.triggered.connect(self.create)
         book_act.setToolTip("Create an ebook")
 
+        settings_act = QAction("&Settings", self)
+        settings_act.setStatusTip("Open settings dialog")
+        settings_act.triggered.connect(self.settingsDialog)
+        settings_act.setToolTip("Open settings dialog")
+
         exit_act = QAction("E&xit", self)
         exit_act.setShortcuts(QKeySequence.Quit)
         exit_act.setStatusTip("Exit the application")
@@ -344,6 +369,8 @@ class MainWindow(QMainWindow):
         file_menu.addAction(new_act)
         file_menu.addAction(open_act)
         file_menu.addAction(book_act)
+        file_menu.addSeparator()
+        file_menu.addAction(settings_act)
         file_menu.addSeparator()
         file_menu.addAction(exit_act)
 
@@ -431,12 +458,12 @@ class MainWindow(QMainWindow):
         self.loadBook(fileName)
 
     def writeSettings(self):
-        settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
+        settings = QSettings(QSettings.IniFormat, QSettings.UserScope, QCoreApplication.organizationName(), QCoreApplication.applicationName())
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("lastBook", self.last_book)
 
     def readSettings(self):
-        settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
+        settings = QSettings(QSettings.IniFormat, QSettings.UserScope, QCoreApplication.organizationName(), QCoreApplication.applicationName())
         geometry = settings.value("geometry", QByteArray())
         self.last_book = settings.value("lastBook")
         if not geometry:
@@ -529,3 +556,15 @@ class MainWindow(QMainWindow):
 
         self.content.setExpanded(True)
         self.content_list.setCurrentRow(0)
+
+    def settingsDialog(self):
+        dlg = SettingsDialog(self.theme, self.palette().highlight().color().name(), parent=self)
+        dlg.exec()
+        if dlg.theme != self.theme or dlg.hilite_color != self.palette().highlight().color().name():
+            settings = QSettings(QSettings.IniFormat, QSettings.UserScope, QCoreApplication.organizationName(), QCoreApplication.applicationName())
+            settings.setValue("theme", dlg.theme)
+            settings.setValue("hiliteColor", dlg.hilite_color)
+
+            msgBox = QMessageBox()
+            msgBox.setText("Please restart the app to change the theme!")
+            msgBox.exec()

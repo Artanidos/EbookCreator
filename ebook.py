@@ -82,7 +82,7 @@ class Ebook(QObject):
     @publisher.setter
     def publisher(self, publisher):
         self._publisher = publisher
-        
+
     def setFilename(self, filename):
         info = QFileInfo(filename)
         self.filename = info.fileName()
@@ -111,6 +111,20 @@ class Ebook(QObject):
         self._parts.append(part)
         with open(os.path.join(self.source_path, "parts", part.src), "w") as f:
             f.write("")
+        self.save()
+
+    def partUp(self, partname):
+        part = self.getPart(partname)
+        pos = self._parts.index(part)
+        self._parts.remove(part)
+        self._parts.insert(pos - 1, part)
+        self.save()
+
+    def partDown(self, partname):
+        part = self.getPart(partname)
+        pos = self._parts.index(part)
+        self._parts.remove(part)
+        self._parts.insert(pos + 1, part)
         self.save()
 
     def save(self):

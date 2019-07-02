@@ -27,8 +27,9 @@ from expander import Expander
 
 class DarkFusion(QProxyStyle):
 
-    def __init__(self):
+    def __init__(self, hilite_color):
         QProxyStyle.__init__(self, QStyleFactory.create("fusion"))
+        self.hilite_color = hilite_color
 
     def polish(self, arg):
         if isinstance(arg, QPalette):
@@ -43,7 +44,7 @@ class DarkFusion(QProxyStyle):
             palette.setColor(QPalette.Button, QColor(53, 53, 53))
             palette.setColor(QPalette.ButtonText, Qt.white)
             palette.setColor(QPalette.BrightText, Qt.red)
-            palette.setColor(QPalette.Highlight, QColor("#9fd723"))
+            palette.setColor(QPalette.Highlight, QColor(self.hilite_color))
             palette.setColor(QPalette.HighlightedText, Qt.black)
             palette.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
             palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
