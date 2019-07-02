@@ -100,11 +100,12 @@ def generatePackage(dir, book, uuid):
 
     for part in book._parts:
         item = {}
-        item["href"] = os.path.join("parts", part.name + ".xhtml")
-        item["id"] = part.name
+        name = part.name.replace(" ", "-").lower()
+        item["href"] = os.path.join("parts", name + ".xhtml")
+        item["id"] = name
         item["type"] = "application/xhtml+xml"
         items.append(item)
-        spine.append(part.name)
+        spine.append(name)
 
     for root, dirs, files in os.walk(os.path.join(dir, "EPUB", "images")):
         for file in files:
@@ -154,12 +155,17 @@ def generateParts(dir, book):
         context = {}
         with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
             text = i.read()
-        list = getCaptions(text, part.name)
+        name = part.name.replace(" ", "-").lower()
+        #list = getCaptions(text, name)
+        #for item in list:
+        #    toc.append(item)
+        html = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
+        list = getLinks(html, name)
         for item in list:
             toc.append(item)
-        context["content"] = mark_safe(fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"])))
+        context["content"] = mark_safe(html)
         xhtml = eng.render_to_string("template.xhtml", context = context)
-        with open(os.path.join(dir, "EPUB", "parts", part.name + ".xhtml"), "w") as f:
+        with open(os.path.join(dir, "EPUB", "parts", name + ".xhtml"), "w") as f:
                 f.write(xhtml)
     return toc
 
@@ -185,19 +191,38 @@ def countHash(text):
     return count
 
 
-def getCaptions(text, part_name):
+def getLinks(text, part_name):
     nodes = []
     list = []
     for line in text.split("\n"):
         if not line:
             continue
-        c = countHash(line)
+        if line.startswith("<h1 "):
+            c = 1
+        elif line.startswith("<h2 "):
+            c = 2
+        elif line.startswith("<h3 "):
+            c = 3
+        elif line.startswith("<h4 "):
+            c = 4
+        elif line.startswith("<h5 "):
+            c = 5
+        elif line.startswith("<h6 "):
+            c = 6
+        else:
+            c = 0
         if c > 0:
-            line = line.strip("#").strip()
+            start = line.find("id=")
+            end = line.find('"', start + 4)
+            id = line[start + 4:end]
+
+            start = line.find(">", end) + 1
+            end = line.find("<", start + 1)
+            name = line[start:end]
             item = {}
-            item["href"] = part_name + ".xhtml#" + line.lower().replace(" ", "-")
-            item["name"] = line
-            item["id"] = part_name.replace(" ", "-")
+            item["href"] = part_name + ".xhtml#" + id
+            item["name"] = name
+            item["id"] = id
             item["parts"] = []
             if len(nodes) < c:
                 nodes.append(item)
