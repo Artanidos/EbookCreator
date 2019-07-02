@@ -197,7 +197,7 @@ def getCaptions(text, part_name):
             item = {}
             item["href"] = part_name + ".xhtml#" + line.lower().replace(" ", "-")
             item["name"] = line
-            item["id"] = part_name
+            item["id"] = part_name.replace(" ", "-")
             item["parts"] = []
             if len(nodes) < c:
                 nodes.append(item)
