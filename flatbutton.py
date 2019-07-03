@@ -20,8 +20,9 @@
 
 import os
 from PyQt5.QtWidgets import QLabel, QWidget, QStyleOption, QStyle
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty, QDir
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty, QDir, QFile, QIODevice
 from PyQt5.QtGui import QPixmap, QImage, QPalette, QPainter
+import resources
 
 
 class FlatButton(QLabel):
@@ -53,8 +54,10 @@ class FlatButton(QLabel):
     def createIcon(self, source, hilite_color):
         bg = self.palette().button().color().name()
         temp = QDir.tempPath()
-        with open(source, "r") as fp:
-            data = fp.read()
+        file = QFile(source)
+        file.open(QIODevice.ReadOnly | QIODevice.Text)
+        data = str(file.readAll(), encoding="utf-8")
+        file.close()
 
         out = os.path.join(temp, hilite_color + ".svg")
         with open(out, "w") as fp:

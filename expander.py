@@ -20,8 +20,9 @@
 
 import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
-from PyQt5.QtCore import QParallelAnimationGroup, QPropertyAnimation, Qt, pyqtProperty, pyqtSignal, QDir
+from PyQt5.QtCore import QParallelAnimationGroup, QPropertyAnimation, Qt, pyqtProperty, pyqtSignal, QDir, QFile, QIODevice
 from PyQt5.QtGui import QImage, QPalette, QPixmap, QColor, QIcon
+import resources
 
 
 class Expander(QWidget):
@@ -73,7 +74,7 @@ class Expander(QWidget):
         self.selected_color = self.palette().highlight().color()
         self.hovered_color = self.palette().alternateBase().color()
 
-        self.normal_icon = QPixmap(self.createIcon(self.svg, self.label_normal_color))
+        self.normal_icon = QPixmap(self.createIcon(self.svg, self.normal_color))
         self.hovered_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
         self.selected_icon = QPixmap(self.createIcon(self.svg, self.label_hovered_color))
 
@@ -84,8 +85,10 @@ class Expander(QWidget):
 
     def createIcon(self, source, hilite_color):
         temp = QDir.tempPath()
-        with open(source, "r") as fp:
-            data = fp.read()
+        file = QFile(source)
+        file.open(QIODevice.ReadOnly | QIODevice.Text)
+        data = str(file.readAll(), encoding="utf-8")
+        file.close()
 
         out = os.path.join(temp, hilite_color + ".svg")
         with open(out, "w") as fp:

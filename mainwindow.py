@@ -19,7 +19,7 @@
 #############################################################################
 
 import sys
-from os import path, remove, walk
+from os import path, remove, walk, getcwd
 from pathlib import Path
 from shutil import copy
 
@@ -47,12 +47,13 @@ from projectwizard import ProjectWizard
 from settings import Settings
 from dark import DarkFusion
 from settingsdialog import SettingsDialog
+import resources
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, install_directory, app):
+    def __init__(self, app):
         QMainWindow.__init__(self)
-        self.install_directory = install_directory
+        self.install_directory = getcwd()
         self.app = app
         self.book = None
         self.last_book = ""
@@ -85,9 +86,9 @@ class MainWindow(QMainWindow):
             self.app.setPalette(pal)
 
     def createUi(self):
-        self.content = Expander("Content", "./images/parts.svg")
-        self.images = Expander("Images", "./images/images.svg")
-        self.settings = Expander("Settings", "./images/settings.svg")
+        self.content = Expander("Content", ":/images/parts.svg")
+        self.images = Expander("Images", ":/images/images.svg")
+        self.settings = Expander("Settings", ":/images/settings.svg")
 
         self.setWindowTitle(QCoreApplication.applicationName() + " " + QCoreApplication.applicationVersion())
         vbox = QVBoxLayout()
@@ -106,10 +107,10 @@ class MainWindow(QMainWindow):
         self.item_anim = QPropertyAnimation(self.item_edit, "maximumHeight".encode("utf-8"))
         content_box.addWidget(self.item_edit)
         button_layout = QHBoxLayout()
-        plus_button = FlatButton("./images/plus.svg")
-        self.trash_button = FlatButton("./images/trash.svg")
-        self.up_button = FlatButton("./images/up.svg")
-        self.down_button = FlatButton("./images/down.svg")
+        plus_button = FlatButton(":/images/plus.svg")
+        self.trash_button = FlatButton(":/images/trash.svg")
+        self.up_button = FlatButton(":/images/up.svg")
+        self.down_button = FlatButton(":/images/down.svg")
         self.trash_button.enabled = False
         self.up_button.enabled = False
         self.down_button.enabled = False
@@ -129,8 +130,8 @@ class MainWindow(QMainWindow):
         image_box = QVBoxLayout()
         image_box.addWidget(self.image_list)
         image_button_layout = QHBoxLayout()
-        image_plus_button = FlatButton("./images/plus.svg")
-        self.image_trash_button = FlatButton("./images/trash.svg")
+        image_plus_button = FlatButton(":/images/plus.svg")
+        self.image_trash_button = FlatButton(":/images/trash.svg")
         self.image_trash_button.enabled = False
         image_button_layout.addWidget(image_plus_button)
         image_button_layout.addWidget(self.image_trash_button)
@@ -307,13 +308,13 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def createMenus(self):
-        new_icon = QIcon(QPixmap("./images/new.svg"))
-        open_icon = QIcon(QPixmap("./images/open.svg"))
-        book_icon = QIcon(QPixmap("./images/book.svg"))
-        bold_icon = QIcon(QPixmap("./images/bold.svg"))
-        italic_icon = QIcon(QPixmap("./images/italic.svg"))
-        image_icon = QIcon(QPixmap("./images/image.svg"))
-        table_icon = QIcon(QPixmap("./images/table.svg"))
+        new_icon = QIcon(QPixmap(":/images/new.svg"))
+        open_icon = QIcon(QPixmap(":/images/open.svg"))
+        book_icon = QIcon(QPixmap(":/images/book.svg"))
+        bold_icon = QIcon(QPixmap(":/images/bold.svg"))
+        italic_icon = QIcon(QPixmap(":/images/italic.svg"))
+        image_icon = QIcon(QPixmap(":/images/image.svg"))
+        table_icon = QIcon(QPixmap(":/images/table.svg"))
 
         new_act = QAction(new_icon, "&New", self)
         new_act.setShortcuts(QKeySequence.New)
@@ -416,7 +417,7 @@ class MainWindow(QMainWindow):
         filename = item.text()
         cursor = self.text_edit.textCursor()
         pos = cursor.position()
-        cursor.insertText("![AltText](../images/" + filename + " \"Title\")")
+        cursor.insertText("![AltText](.:/images/" + filename + " \"Title\")")
         cursor.setPosition(pos)
         self.text_edit.setTextCursor(cursor)
 
@@ -434,7 +435,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Ready")
 
     def about(self):
-        QMessageBox.about(self, "About " + QCoreApplication.applicationName(), "Using this appication you are able to create an ebook based on the markdown language.")
+        QMessageBox.about(self, "About " + QCoreApplication.applicationName(), "EbookCreator\nVersion: " + QCoreApplication.applicationVersion() + "\n(C) Copyright 2019 Olaf Japp. All rights reserved.\n\nThis program is provided AS IS with NO\nWARRANTY OF ANY KIND, INCLUDING THE\nWARRANTY OF DESIGN, MERCHANTABILITY AND\nFITNESS FOR A PATICULAR PURPOSE.")
 
     def newFile(self):
         dlg = ProjectWizard(self.install_directory, parent = self)

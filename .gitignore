@@ -1,3 +1,7 @@
 .vscode
 __pycache__
 Sample
+build
+dist
+packages/com.vendor.product/data
+EbookCreator-Linux-1.0.0.Setup

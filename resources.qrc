@@ -1,0 +1,20 @@
+<RCC>
+    <qresource>
+        <file>images/bold.svg</file>
+        <file>images/book.svg</file>
+        <file>images/down.svg</file>
+        <file>images/image.svg</file>
+        <file>images/images.svg</file>
+        <file>images/italic.svg</file>
+        <file>images/logo.svg</file>
+        <file>images/new.svg</file>
+        <file>images/open.svg</file>
+        <file>images/parts.svg</file>
+        <file>images/plus.svg</file>
+        <file>images/settings.svg</file>
+        <file>images/table.svg</file>
+        <file>images/trash.svg</file>
+        <file>images/up.svg</file>
+        <file>images/wizard.svg</file>
+    </qresource>
+</RCC>

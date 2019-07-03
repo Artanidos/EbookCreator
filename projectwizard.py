@@ -24,6 +24,7 @@ import shutil
 from PyQt5.QtWidgets import QWizard, QWizardPage, QLabel, QLineEdit, QComboBox, QGridLayout, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QDir
 from PyQt5.QtGui import QPixmap
+import resources
 
 
 class ProjectWizard(QWizard):
@@ -77,7 +78,7 @@ class IntroPage(QWizardPage):
     def __init__(self):
         QWizardPage.__init__(self)
         self.setTitle("Introduction")
-        self.setPixmap(QWizard.WatermarkPixmap, QPixmap("./images/wizard.svg"))
+        self.setPixmap(QWizard.WatermarkPixmap, QPixmap(":/images/wizard.svg"))
 
         label = QLabel("This wizard will generate a skeleton project. "
                        "You simply need to specify the project name and set a "
@@ -97,7 +98,7 @@ class ProjectInfoPage(QWizardPage):
         self.setTitle("Project Information")
         self.setSubTitle("Specify basic information about the project for which you "
                          "want to generate project files.")
-        self.setPixmap(QWizard.LogoPixmap, QPixmap("./images/logo.svg"))
+        self.setPixmap(QWizard.LogoPixmap, QPixmap(":/images/logo.svg"))
 
         self.projectNameLabel = QLabel("&Book title:")
         self.projectNameLineEdit = QLineEdit()
@@ -166,7 +167,7 @@ class ConclusionPage(QWizardPage):
     def __init__(self):
         QWizardPage.__init__(self)
         self.setTitle("Conclusion")
-        self.setPixmap(QWizard.WatermarkPixmap, QPixmap("./images/wizard.png"))
+        self.setPixmap(QWizard.WatermarkPixmap, QPixmap(":/images/wizard.png"))
 
         self.label = QLabel("Click Finish to generate the project skeleton.")
         self.label.setWordWrap(True)

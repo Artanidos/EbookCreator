@@ -27,7 +27,7 @@ from PyQt5.QtQml import qmlRegisterType
 from mainwindow import MainWindow
 from ebook import Ebook
 from part import Part
-from installdialog import InstallDialog
+import main_rc
 
 
 if __name__ == "__main__":
@@ -45,25 +45,8 @@ if __name__ == "__main__":
 
     font = QFont("Sans Serif", 10)
     app.setFont(font)
-    app.setWindowIcon(QIcon("images/logo.svg"))
+    app.setWindowIcon(QIcon(":/images/logo.svg"))
 
-    settings = QSettings(QCoreApplication.organizationName(), QCoreApplication.applicationName())
-    install_directory = settings.value("installDirectory")
-    if not install_directory:
-        dlg = InstallDialog()
-        dlg.exec_()
-        install_directory = dlg.install_directory
-        if not install_directory:
-            sys.exit(-1)
-        settings.setValue("installDirectory", install_directory)
-        if not os.path.isdir(install_directory):
-            os.mkdir(install_directory)
-        if not os.path.isdir(os.path.join(install_directory, "sources")):
-            os.mkdir(os.path.join(install_directory, "sources"))
-        if not os.path.isdir(os.path.join(install_directory, "books")):
-            os.mkdir(os.path.join(install_directory, "books"))
-        del dlg
-
-    win = MainWindow(install_directory, app)
+    win = MainWindow(app)
     win.show()
     sys.exit(app.exec_())
