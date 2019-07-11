@@ -134,6 +134,8 @@ class Expander(QWidget):
         self.setPalette(pal)
 
     def mouseReleaseEvent(self, me):
+        if me.button() != Qt.LeftButton or me.y() > 32:
+            return
         self.setExpanded(not self.is_expanded)
         if self.is_expanded:
             self.clicked.emit()

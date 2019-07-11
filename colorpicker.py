@@ -56,9 +56,11 @@ class ColorPicker(QWidget):
         painter.drawImage(0, 0, image)
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and event.y() >= 0 and event.y() <= 100 and event.x() >= 0 and event.x() <= 100:
             self._lpressed = True
-        self.colorChanged.emit(self.getColor(event))
+            self.colorChanged.emit(self.getColor(event))
+        else:
+            self._lpressed = False
 
     def mouseReleaseEvent(self, event):
         if self._lpressed:

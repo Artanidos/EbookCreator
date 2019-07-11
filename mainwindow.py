@@ -19,7 +19,7 @@
 #############################################################################
 
 import sys
-from os import path, remove, walk, getcwd
+import os
 from pathlib import Path
 from shutil import copy
 
@@ -53,7 +53,7 @@ import resources
 class MainWindow(QMainWindow):
     def __init__(self, app):
         QMainWindow.__init__(self)
-        self.install_directory = getcwd()
+        self.install_directory = os.getcwd()
         self.app = app
         self.book = None
         self.last_book = ""
@@ -223,24 +223,27 @@ class MainWindow(QMainWindow):
         del dialog
         if not fileName:
             return
-        copy(fileName, path.join(self.book.source_path, "images"))
+
+        base = os.path.basename(fileName)
+        if not os.path.exists(os.path.join(self.book.source_path, "images", base)):
+            copy(fileName, os.path.join(self.book.source_path, "images"))
         item = QListWidgetItem()
         item.setText(Path(fileName).name)
-        item.setData(1, path.join(self.book.source_path, "images", Path(fileName).name))
+        item.setData(1, os.path.join(self.book.source_path, "images", Path(fileName).name))
         self.image_list.addItem(item)
 
     def dropImage(self):
         item = self.image_list.currentItem()
         image = item.data(1)
-        filename = path.join(self.book.source_path, "parts", image)
-        remove(filename)
+        filename = os.path.join(self.book.source_path, "parts", image)
+        os.remove(filename)
         self.loadImages()
 
     def loadImages(self):
         self.image_list.clear()
-        for root, dir, files in walk(path.join(self.book.source_path, "images")):
+        for root, dir, files in os.walk(os.path.join(self.book.source_path, "images")):
             for file in files:
-                filename = path.join(self.book.source_path, "images", Path(file).name)
+                filename = os.path.join(self.book.source_path, "images", Path(file).name)
                 item = QListWidgetItem()
                 item.setToolTip("Doubleclick image to insert into text")
                 item.setText(Path(file).name)
@@ -264,7 +267,7 @@ class MainWindow(QMainWindow):
     def partSelectionChanged(self, item):
         if item:
             part = item.data(1)
-            self.filename = path.join(self.book.source_path, "parts", part.src)
+            self.filename = os.path.join(self.book.source_path, "parts", part.src)
             with open(self.filename, "r") as f:
                 self.text_edit.setText(f.read())
             self.trash_button.enabled = True
@@ -417,7 +420,7 @@ class MainWindow(QMainWindow):
         filename = item.text()
         cursor = self.text_edit.textCursor()
         pos = cursor.position()
-        cursor.insertText("![AltText](.:/images/" + filename + " \"Title\")")
+        cursor.insertText("![AltText](../images/" + filename + " \"Title\")")
         cursor.setPosition(pos)
         self.text_edit.setTextCursor(cursor)
 
@@ -450,7 +453,7 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle("Load Ebook")
         dialog.setOption(QFileDialog.DontUseNativeDialog, True)
         dialog.setAcceptMode(QFileDialog.AcceptOpen)
-        dialog.setDirectory(path.join(self.install_directory, "sources"))
+        dialog.setDirectory(os.path.join(self.install_directory, "sources"))
         if dialog.exec_():
             fileName = dialog.selectedFiles()[0]
         del dialog
@@ -509,7 +512,7 @@ class MainWindow(QMainWindow):
         html += "</head>\n<body>\n"
         html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
         html += "\n</body>\n</html>"
-        self.preview.setHtml(html, baseUrl = QUrl(Path(path.join(self.book.source_path, "parts", "index.html")).as_uri()))
+        self.preview.setHtml(html, baseUrl = QUrl(Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
 
     def create(self):
         filename = ""
