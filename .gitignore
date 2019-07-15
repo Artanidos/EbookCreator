@@ -1,5 +1,7 @@
 .vscode
 __pycache__
+sources
+books
 Sample
 build
 dist

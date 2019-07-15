@@ -271,6 +271,7 @@ class MainWindow(QMainWindow):
         if item:
             part = item.data(1)
             self.filename = os.path.join(self.book.source_path, "parts", part.src)
+            print("part", self.filename)
             with open(self.filename, "r") as f:
                 self.text_edit.setText(f.read())
             self.trash_button.enabled = True
@@ -523,33 +524,41 @@ class MainWindow(QMainWindow):
         createEpub(filename, self.book, self)
         QApplication.restoreOverrideCursor()
 
+    def loadStatusChanged(self, status):
+        if status == 1:
+            self.book = self.component.create()
+            if self.book is not None:
+                self.book.setFilename(self.last_book)
+                self.book.setWindow(self)
+            else:
+                for error in self.component.errors():
+                    print(error.toString())
+                return
+
+            self.content_list.clear()
+            for part in self.book.parts:
+                item = QListWidgetItem()
+                item.setText(part.name)
+                item.setData(1, part)
+                self.content_list.addItem(item)
+
+            self.loadImages()
+            self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
+
+            self.content.setExpanded(True)
+            self.content_list.setCurrentRow(0)
+        elif status == 3:
+            for error in self.component.errors():
+                print(error.toString())
+            return
+
     def loadBook(self, filename):
         self.last_book = filename
         self.filename = ""
         engine = QQmlEngine()
-        component = QQmlComponent(engine)
-        component.loadUrl(QUrl(filename))
-        self.book = component.create()
-        if self.book is not None:
-            self.book.setFilename(filename)
-            self.book.setWindow(self)
-        else:
-            for error in component.errors():
-                print(error.toString())
-                return
-
-        self.content_list.clear()
-        for part in self.book.parts:
-            item = QListWidgetItem()
-            item.setText(part.name)
-            item.setData(1, part)
-            self.content_list.addItem(item)
-
-        self.loadImages()
-        self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
-
-        self.content.setExpanded(True)
-        self.content_list.setCurrentRow(0)
+        self.component = QQmlComponent(engine)
+        self.component.statusChanged.connect(self.loadStatusChanged)
+        self.component.loadUrl(QUrl.fromLocalFile(filename))
 
     def settingsDialog(self):
         dlg = SettingsDialog(self.theme, self.palette().highlight().color().name(), parent=self)
