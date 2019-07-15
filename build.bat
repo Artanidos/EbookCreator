@@ -1,5 +1,5 @@
-rmdir -r dist /s /q
-rmdir -r packages\com.vendor.product\data /s /q
+rmdir dist /s /q
+rmdir packages\com.vendor.product\data /s /q
 pyinstaller main.py
 copy dist\main\Qt5Core.dll dist\main\PyQt5\Qt\bin
 mkdir packages\com.vendor.product\data\bin

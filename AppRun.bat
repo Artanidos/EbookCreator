@@ -1,1 +1,1 @@
-bin/EbookCreator
+bin\EbookCreator.exe
