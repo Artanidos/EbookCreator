@@ -22,11 +22,11 @@ import sys
 import os
 from pathlib import Path
 from shutil import copy
-
+from threading import Thread
 from django.utils.safestring import mark_safe
 from markdown2 import markdown
 from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
-                          QSettings, Qt, QUrl, QSize)
+                          QSettings, Qt, QUrl, QSize, pyqtSignal)
 from PyQt5.QtGui import (QColor, QFont, QIcon, QKeySequence, QPalette,
                          QTextCursor, QImage, QPixmap)
 from PyQt5.QtQml import QQmlComponent, QQmlEngine
@@ -51,6 +51,8 @@ import resources
 
 
 class MainWindow(QMainWindow):
+    htmlReady = pyqtSignal(str)
+
     def __init__(self, app):
         QMainWindow.__init__(self)
         self.install_directory = os.getcwd()
@@ -58,6 +60,7 @@ class MainWindow(QMainWindow):
         self.book = None
         self.last_book = ""
         self.filename = ""
+        self.tread_running = False
         self.initTheme()
         self.createUi()
         self.createMenus()
@@ -501,19 +504,6 @@ class MainWindow(QMainWindow):
         cursor.setPosition(pos + 1)
         self.text_edit.setTextCursor(cursor)
 
-    def textChanged(self):
-        if self.filename:
-            with open(self.filename, "w") as f:
-                f.write(self.text_edit.toPlainText())
-
-        html = "<html>\n<head>\n"
-        html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-        html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-        html += "</head>\n<body>\n"
-        html += mark_safe(markdown(self.text_edit.toPlainText(), html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
-        html += "\n</body>\n</html>"
-        self.preview.setHtml(html, baseUrl = QUrl(Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
-
     def create(self):
         filename = ""
         dialog = QFileDialog()
@@ -572,3 +562,29 @@ class MainWindow(QMainWindow):
             msgBox = QMessageBox()
             msgBox.setText("Please restart the app to change the theme!")
             msgBox.exec()
+
+    def textChanged(self):
+        if self.filename:
+            with open(self.filename, "w") as f:
+                f.write(self.text_edit.toPlainText())
+
+        if not self.tread_running:
+            self.tread_running = True
+            self.htmlReady.connect(self.previewReady)
+            thread = Thread(target=self.createHtml, args=(self.text_edit.toPlainText(),))
+            thread.daemon = True
+            thread.start()
+
+    def previewReady(self, html):
+        self.preview.setHtml(html, baseUrl = QUrl(Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
+        self.htmlReady.disconnect()
+        self.tread_running = False
+
+    def createHtml(self, text):
+        html = "<html>\n<head>\n"
+        html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+        html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+        html += "</head>\n<body>\n"
+        html += mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
+        html += "\n</body>\n</html>"
+        self.htmlReady.emit(html)
