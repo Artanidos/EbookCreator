@@ -3,6 +3,6 @@
       <DisplayName>EbookCreator</DisplayName>
       <Description>Install this application.</Description>
       <Version>0.1.0-1</Version>
-      <ReleaseDate>2019-07-02</ReleaseDate>
+      <ReleaseDate>2019-07-15</ReleaseDate>
       <Default>true</Default>
   </Package>

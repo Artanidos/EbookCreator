@@ -271,7 +271,6 @@ class MainWindow(QMainWindow):
         if item:
             part = item.data(1)
             self.filename = os.path.join(self.book.source_path, "parts", part.src)
-            print("part", self.filename)
             with open(self.filename, "r") as f:
                 self.text_edit.setText(f.read())
             self.trash_button.enabled = True
