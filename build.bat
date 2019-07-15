@@ -1,6 +1,6 @@
 rmdir dist /s /q
 rmdir packages\com.vendor.product\data /s /q
-pyinstaller main.py
+pyinstaller --windowed --icon=logo.ico main.py
 copy dist\main\Qt5Core.dll dist\main\PyQt5\Qt\bin
 mkdir packages\com.vendor.product\data\bin
 mkdir packages\com.vendor.product\data\themes

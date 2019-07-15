@@ -5,4 +5,5 @@
       <Version>0.1.0-1</Version>
       <ReleaseDate>2019-07-15</ReleaseDate>
       <Default>true</Default>
+      <Script>installscript.qs</Script>
   </Package>
