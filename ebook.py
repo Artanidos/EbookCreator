@@ -141,7 +141,6 @@ class Ebook(QObject):
             f.write("    language: \"" + self._language + "\"\n")
             f.write("    theme: \"" + self._theme + "\"\n")
             f.write("    creator: \"" + self._creator + "\"\n")
-            f.write("    publisher: \"" + self._publisher + "\"\n")
             for part in self._parts:
                 f.write("    Part {\n")
                 f.write("        src: \"" + part.src + "\"\n")

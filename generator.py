@@ -94,7 +94,6 @@ def generatePackage(dir, book, uuid):
     context["date"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     context["version"] = QCoreApplication.applicationVersion()
     context["creator"] = book.creator
-    context["publisher"] = book.publisher
     items = []
     spine = []
 
