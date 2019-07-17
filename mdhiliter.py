@@ -19,6 +19,7 @@
 #############################################################################
 
 from PyQt5.QtGui import QFont, QFontMetrics, QImage, QSyntaxHighlighter, QTextCharFormat, QColor
+from PyQt5.QtWidgets import QWidget
 
 TITLE = 0
 BOLD = 1
@@ -33,7 +34,7 @@ class MdHiLiter(QSyntaxHighlighter):
 
         self.formats = [0] * (LAST_CONSTRUCT + 1)
         titleFormat = QTextCharFormat()
-        titleFormat.setForeground(QColor("#4d94d6"))
+        titleFormat.setForeground(QWidget().palette().highlight().color())
         titleFormat.setFontWeight(QFont.Bold)
         self.setFormatFor(TITLE, titleFormat)
 
