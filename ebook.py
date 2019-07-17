@@ -113,6 +113,11 @@ class Ebook(QObject):
             f.write("")
         self.save()
 
+    def updatePart(self, oldname, newname):
+        part = self.getPart(oldname)
+        part.name = newname
+        self.save()
+
     def partUp(self, partname):
         part = self.getPart(partname)
         pos = self._parts.index(part)

@@ -16,5 +16,6 @@
         <file>images/trash.svg</file>
         <file>images/up.svg</file>
         <file>images/wizard.svg</file>
+        <file>images/edit.svg</file>
     </qresource>
 </RCC>

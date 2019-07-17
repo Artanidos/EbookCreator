@@ -59,6 +59,7 @@ class MainWindow(QMainWindow):
         self.book = None
         self.last_book = ""
         self.filename = ""
+        self._part_is_new = False
         self.tread_running = False
         self.initTheme()
         self.createUi()
@@ -105,11 +106,12 @@ class MainWindow(QMainWindow):
         content_box.addWidget(self.content_list)
         self.item_edit = QLineEdit()
         self.item_edit.setMaximumHeight(0)
-        self.item_edit.editingFinished.connect(self.addItem)
+        self.item_edit.editingFinished.connect(self.editItemFinished)
         self.item_anim = QPropertyAnimation(self.item_edit, "maximumHeight".encode("utf-8"))
         content_box.addWidget(self.item_edit)
         button_layout = QHBoxLayout()
         plus_button = FlatButton(":/images/plus.svg")
+        self.edit_button = FlatButton(":/images/edit.svg")
         self.trash_button = FlatButton(":/images/trash.svg")
         self.up_button = FlatButton(":/images/up.svg")
         self.down_button = FlatButton(":/images/down.svg")
@@ -119,6 +121,7 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(plus_button)
         button_layout.addWidget(self.up_button)
         button_layout.addWidget(self.down_button)
+        button_layout.addWidget(self.edit_button)
         button_layout.addWidget(self.trash_button)
         content_box.addLayout(button_layout)
         self.content.addLayout(content_box)
@@ -126,6 +129,7 @@ class MainWindow(QMainWindow):
         self.trash_button.clicked.connect(self.dropPart)
         self.up_button.clicked.connect(self.partUp)
         self.down_button.clicked.connect(self.partDown)
+        self.edit_button.clicked.connect(self.editPart)
 
         self.image_list = QListWidget()
         self.image_list.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
@@ -189,6 +193,7 @@ class MainWindow(QMainWindow):
         self.item_anim.setStartValue(0)
         self.item_anim.setEndValue(23)
         self.item_anim.start()
+        self._part_is_new = True
 
     def addItem(self):
         text = self.item_edit.text()
@@ -196,9 +201,31 @@ class MainWindow(QMainWindow):
             if not self.book.getPart(text):
                 self.book.addPart(text)
                 self.loadBook(self.last_book)
+        
+    def updateItem(self):
+        text = self.item_edit.text()
+        if text:
+            if not self.book.getPart(text):
+                self.book.updatePart(self.content_list.currentItem().data(1).name, text)
+                self.loadBook(self.last_book)
+
+    def editItemFinished(self):
+        if self._part_is_new:
+            self.addItem()
+        else:
+            self.updateItem()
         self.item_anim.setStartValue(23)
         self.item_anim.setEndValue(0)
         self.item_anim.start()
+
+    def editPart(self):
+        item = self.content_list.currentItem().data(1).name
+        self.item_edit.setText(item)
+        self.item_edit.setFocus()
+        self.item_anim.setStartValue(0)
+        self.item_anim.setEndValue(23)
+        self.item_anim.start()
+        self._part_is_new = False
 
     def dropPart(self):
         item = self.content_list.currentItem().data(1).name
@@ -275,11 +302,13 @@ class MainWindow(QMainWindow):
             self.trash_button.enabled = True
             self.up_button.enabled = self.content_list.currentRow() > 0
             self.down_button.enabled = self.content_list.currentRow() < self.content_list.count() - 1
+            self.edit_button.enabled = True
         else:
             self.text_edit.setText("")
             self.trash_button.enabled = False
             self.up_button.enabled = False
             self.down_button.enabled = False
+            self.edit_button.enabled = False
 
     def imageSelectionChanged(self, item):
         if item:
