@@ -23,7 +23,6 @@ import os
 from pathlib import Path
 from shutil import copy
 from threading import Thread
-from django.utils.safestring import mark_safe
 from markdown2 import markdown
 from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
                           QSettings, Qt, QUrl, QSize, pyqtSignal)
@@ -593,6 +592,6 @@ class MainWindow(QMainWindow):
         html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "</head>\n<body>\n"
-        html += mark_safe(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
+        html += markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"])
         html += "\n</body>\n</html>"
         self.htmlReady.emit(html)

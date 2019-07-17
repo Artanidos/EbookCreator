@@ -36,7 +36,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     QCoreApplication.setOrganizationName("Artanidos")
     QCoreApplication.setApplicationName("EbookCreator")
-    QCoreApplication.setApplicationVersion("1.0.2")
+    QCoreApplication.setApplicationVersion("1.1.0")
 
     app.setStyle(QStyleFactory.create("Fusion"))
 

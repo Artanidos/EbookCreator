@@ -25,8 +25,8 @@ import shutil
 from tempfile import mkdtemp
 from shutil import rmtree
 from markdown2 import markdown
-from django.template import Context, Engine
-from django.utils.safestring import mark_safe
+from markupsafe import Markup
+from jinja2 import Template
 from zipfile import ZipFile
 from PyQt5.QtCore import QCoreApplication
 
@@ -119,11 +119,10 @@ def generatePackage(dir, book, uuid):
     context["items"] = items
     context["spine"] = spine
     path = os.getcwd()
-    dirs = [
-        path + "/themes/" + book.theme + "/layout",
-    ]
-    eng = Engine(dirs = dirs, debug = False)
-    xml = eng.render_to_string("package.opf", context = context)
+    with open(os.path.join(path, "themes", book.theme, "layout", "package.opf"), "r") as fp:
+        data = fp.read()
+    tmp = Template(data)
+    xml = tmp.render(context)
     with open(os.path.join(dir, "EPUB", "package.opf"), "w") as f:
         f.write(xml)
 
@@ -147,24 +146,20 @@ def generateParts(dir, book):
     item["parts"] = []
     toc.append(item)
     path = os.getcwd()
-    dirs = [
-        path + "/themes/" + book.theme + "/layout",
-    ]
-    eng = Engine(dirs = dirs, debug = False)
     for part in book._parts:
         context = {}
         with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
             text = i.read()
         name = part.name.replace(" ", "-").lower()
-        #list = getCaptions(text, name)
-        #for item in list:
-        #    toc.append(item)
         html = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
         list = getLinks(html, name)
         for item in list:
             toc.append(item)
-        context["content"] = mark_safe(html)
-        xhtml = eng.render_to_string("template.xhtml", context = context)
+        context["content"] = html
+        with open(os.path.join(path, "themes", book.theme, "layout", "template.xhtml")) as fp:
+            data = fp.read()
+        tmp = Template(data)
+        xhtml = tmp.render(context)
         with open(os.path.join(dir, "EPUB", "parts", name + ".xhtml"), "w") as f:
                 f.write(xhtml)
     return toc
@@ -239,10 +234,9 @@ def generateToc(dir, book, parts):
     path = os.getcwd()
     context = {}
     context["parts"] = parts
-    dirs = [
-        path + "/themes/" + book.theme + "/layout",
-    ]
-    eng = Engine(dirs = dirs, debug = False)
-    xhtml = eng.render_to_string("toc.xhtml", context = context)
+    with open(os.path.join(path, "themes", book.theme, "layout", "toc.xhtml"), "r") as fp:
+        data = fp.read()
+    tmp = Template(data)
+    xhtml = tmp.render(context)
     with open(os.path.join(dir, "EPUB", "parts", "toc.xhtml"), "w") as f:
         f.write(xhtml)
