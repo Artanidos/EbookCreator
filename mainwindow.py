@@ -22,7 +22,7 @@ import sys
 import os
 from pathlib import Path
 from shutil import copy
-from threading import Thread
+from threading import Thread, Lock
 from markdown2 import markdown
 from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
                           QSettings, Qt, QUrl, QSize, pyqtSignal)
@@ -451,7 +451,8 @@ class MainWindow(QMainWindow):
         filename = item.text()
         cursor = self.text_edit.textCursor()
         pos = cursor.position()
-        cursor.insertText("![AltText](../images/" + filename + " \"Title\")")
+        base = filename.split(".")[0]
+        cursor.insertText("![" + base + "](../images/" + filename + " \"" + base + "\")")
         cursor.setPosition(pos)
         self.text_edit.setTextCursor(cursor)
 
@@ -604,17 +605,20 @@ class MainWindow(QMainWindow):
             with open(self.filename, "w") as f:
                 f.write(self.text_edit.toPlainText())
 
-        if not self.tread_running:
-            self.tread_running = True
-            self.htmlReady.connect(self.previewReady)
-            thread = Thread(target=self.createHtml, args=(self.text_edit.toPlainText(),))
-            thread.daemon = True
-            thread.start()
+        self.lock = Lock()
+        with self.lock:
+            if not self.tread_running:
+                self.tread_running = True
+                self.htmlReady.connect(self.previewReady)
+                thread = Thread(target=self.createHtml, args=(self.text_edit.toPlainText(),))
+                thread.daemon = True
+                thread.start()
 
     def previewReady(self, html):
         self.preview.setHtml(html, baseUrl = QUrl(Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
         self.htmlReady.disconnect()
-        self.tread_running = False
+        with self.lock:
+            self.tread_running = False
 
     def createHtml(self, text):
         html = "<html>\n<head>\n"
