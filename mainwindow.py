@@ -39,7 +39,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QDockWidget,
 from ebook import Ebook
 from expander import Expander
 from flatbutton import FlatButton
-from generator import createEpub
+from generator import createEpub, addLineNumbers
 from hyperlink import HyperLink
 from markdownedit import MarkdownEdit
 from projectwizard import ProjectWizard
@@ -181,6 +181,26 @@ class MainWindow(QMainWindow):
         self.image_list.currentItemChanged.connect(self.imageSelectionChanged)
         self.image_list.itemDoubleClicked.connect(self.insertImage)
 
+        self.text_edit.undoAvailable.connect(self.undoAvailable)
+        self.text_edit.redoAvailable.connect(self.redoAvailable)
+        self.text_edit.copyAvailable.connect(self.copyAvailable)
+
+        QApplication.clipboard().dataChanged.connect(self.clipboardDataChanged)
+
+    def undoAvailable(self, value):
+        self.undo_act.setEnabled(value)
+
+    def redoAvailable(self, value):
+        self.redo_act.setEnabled(value)
+
+    def copyAvailable(self, value):
+        self.copy_act.setEnabled(value)
+        self.cut_act.setEnabled(value)
+
+    def clipboardDataChanged(self):
+        md = QApplication.clipboard().mimeData()
+        self.paste_act.setEnabled(md.hasText())
+
     def openSettings(self):
         dlg = Settings(self.book)
         dlg.exec()
@@ -201,7 +221,7 @@ class MainWindow(QMainWindow):
             if not self.book.getPart(text):
                 self.book.addPart(text)
                 self.loadBook(self.last_book)
-        
+
     def updateItem(self):
         text = self.item_edit.text()
         if text:
@@ -378,6 +398,31 @@ class MainWindow(QMainWindow):
         exit_act.setStatusTip("Exit the application")
         exit_act.triggered.connect(self.close)
 
+        self.undo_act = QAction("Undo", self)
+        self.undo_act.setShortcut(QKeySequence.Undo)
+        self.undo_act.setEnabled(False)
+        self.undo_act.triggered.connect(self.doUndo)
+
+        self.redo_act = QAction("Redo", self)
+        self.redo_act.setShortcut(QKeySequence.Redo)
+        self.redo_act.setEnabled(False)
+        self.undo_act.triggered.connect(self.doRedo)
+
+        self.cut_act = QAction("Cu&t", self)
+        self.cut_act.setShortcut(QKeySequence.Cut)
+        self.cut_act.triggered.connect(self.doCut)
+        self.cut_act.setEnabled(False)
+
+        self.copy_act = QAction("&Copy", self)
+        self.copy_act.setShortcut(QKeySequence.Copy)
+        self.copy_act.triggered.connect(self.doCopy)
+        self.copy_act.setEnabled(False)
+
+        self.paste_act = QAction("&Paste", self)
+        self.paste_act.setShortcut(QKeySequence.Paste)
+        self.paste_act.triggered.connect(self.doPaste)
+        self.paste_act.setEnabled(False)
+
         bold_act = QAction(bold_icon, "Bold", self)
         bold_act.setShortcut(Qt.CTRL + Qt.Key_B)
         bold_act.triggered.connect(self.bold)
@@ -409,6 +454,14 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(exit_act)
 
+        edit_menu = self.menuBar().addMenu("&Edit")
+        edit_menu.addAction(self.undo_act)
+        edit_menu.addAction(self.redo_act)
+        edit_menu.addSeparator()
+        edit_menu.addAction(self.cut_act)
+        edit_menu.addAction(self.copy_act)
+        edit_menu.addAction(self.paste_act)
+
         format_menu = self.menuBar().addMenu("&Format")
         format_menu.addAction(bold_act)
         format_menu.addAction(italic_act)
@@ -433,6 +486,21 @@ class MainWindow(QMainWindow):
         insert_toolbar.addAction(image_act)
         insert_toolbar.addAction(table_act)
 
+    def doUndo(self):
+        self.text_edit.undo()
+
+    def doRedo(self):
+        self.text_edit.redo()
+
+    def doCut(self):
+        self.text_edit.cut()
+
+    def doCopy(self):
+        self.text_edit.copy()
+
+    def doPaste(self):
+        self.text_edit.paste()
+
     def insertImage(self):
         if not self.book:
             QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to load or create a book first!")
@@ -451,7 +519,7 @@ class MainWindow(QMainWindow):
         filename = item.text()
         cursor = self.text_edit.textCursor()
         pos = cursor.position()
-        base = filename.split(".")[0]
+        base = filename.split(".")[0].replace("_", "-")
         cursor.insertText("![" + base + "](../images/" + filename + " \"" + base + "\")")
         cursor.setPosition(pos)
         self.text_edit.setTextCursor(cursor)
@@ -627,4 +695,5 @@ class MainWindow(QMainWindow):
         html += "</head>\n<body>\n"
         html += markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"])
         html += "\n</body>\n</html>"
+        html = addLineNumbers(html)
         self.htmlReady.emit(html)

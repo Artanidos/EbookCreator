@@ -29,6 +29,7 @@ from markupsafe import Markup
 from jinja2 import Template
 from zipfile import ZipFile
 from PyQt5.QtCore import QCoreApplication
+from xml.dom.minidom import parseString
 
 
 def createEpub(output, book, win):
@@ -159,9 +160,36 @@ def generateParts(dir, book):
             data = fp.read()
         tmp = Template(data)
         xhtml = tmp.render(context)
+        xhtml = addLineNumbers(xhtml)
         with open(os.path.join(dir, "EPUB", "parts", name + ".xhtml"), "w") as f:
                 f.write(xhtml)
     return toc
+
+
+def addLineNumbers(html):
+    pos = 0
+    ret = ""
+    end = 0
+    while True:
+        old_pos = pos
+        pos = html.find("<code>", pos + 1)
+        if pos < 0:
+            break
+        end = html.find("</code>", pos + 6)
+        inner = html[pos + 6:end - 1]
+        ret += html[old_pos:pos] + "<code>"
+        pos = end
+        line_no = 1
+        lines = inner.split("\n")
+        for line in lines:
+            if len(lines) > 1:
+                ret += "<span class=\"line-number\"><span>" + str(line_no) + "</span></span> " + line + "\n"
+            else:
+                ret += line + "\n"
+            line_no += 1
+    ret += html[end:]
+
+    return ret
 
 
 def copyAssets(dir, theme):
