@@ -16,13 +16,16 @@ pre {
   margin-bottom: 1rem;
   font-size: 0.7rem;
   line-height: 1.4;
-  white-space: pre;
   overflow: auto;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   padding: .5rem;
-  max-height: 800px;
   font-family: monospace;
+  white-space: -moz-pre-wrap !important;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 pre code {
@@ -38,6 +41,7 @@ pre .line-number {
   margin: 0 1em 0 -1em;
   border-right: 1px solid #ddd;
   text-align: right;
+  width: 1.9rem;
 }
 
 pre .line-number span {
