@@ -690,7 +690,7 @@ class MainWindow(QMainWindow):
                 thread.start()
 
     def previewReady(self, html):
-        self.preview.setHtml(html, baseUrl = QUrl(Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
+        self.preview.setHtml(html, baseUrl=QUrl(Path(os.path.join(self.book.source_path, "parts", "index.html")).as_uri()))
         self.htmlReady.disconnect()
         with self.lock:
             self.tread_running = False
@@ -700,7 +700,7 @@ class MainWindow(QMainWindow):
         html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "</head>\n<body>\n"
-        html += markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"])
+        html += markdown(text, html4tags=False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"])
         html += "\n</body>\n</html>"
         html = addLineNumbers(html)
         self.htmlReady.emit(html)

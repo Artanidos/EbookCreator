@@ -41,7 +41,7 @@ pre .line-number {
   margin: 0 1em 0 -1em;
   border-right: 1px solid #ddd;
   text-align: right;
-  width: 38px;
+  width: 2.0rem;
 }
 
 pre .line-number span {
