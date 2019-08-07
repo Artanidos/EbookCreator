@@ -141,7 +141,7 @@ def generateParts(dir, book):
     toc = []
     item = {}
     item["href"] = "toc.xhtml"
-    item["name"] = "Toc"
+    item["name"] = "Table of Contents"
     item["id"] = "nav"
     item["parts"] = []
     toc.append(item)

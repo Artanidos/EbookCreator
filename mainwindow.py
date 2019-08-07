@@ -25,7 +25,7 @@ from shutil import copy
 from threading import Thread, Lock
 from markdown2 import markdown
 from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
-                          QSettings, Qt, QUrl, QSize, pyqtSignal)
+                          QSettings, Qt, QUrl, QSize, pyqtSignal, QMarginsF)
 from PyQt5.QtGui import (QColor, QFont, QIcon, QKeySequence, QPalette,
                          QTextCursor, QImage, QPixmap)
 from PyQt5.QtQml import QQmlComponent, QQmlEngine
@@ -46,6 +46,7 @@ from projectwizard import ProjectWizard
 from settings import Settings
 from dark import DarkFusion
 from settingsdialog import SettingsDialog
+from pdfexport import PdfExport
 import resources
 
 
@@ -388,6 +389,11 @@ class MainWindow(QMainWindow):
         book_act.triggered.connect(self.create)
         book_act.setToolTip("Create an ebook")
 
+        pdf_act = QAction("Create &PDF", self)
+        pdf_act.setStatusTip("Create PDF")
+        pdf_act.setToolTip("Create PDF")
+        pdf_act.triggered.connect(self.pdfExport)
+
         settings_act = QAction("&Settings", self)
         settings_act.setStatusTip("Open settings dialog")
         settings_act.triggered.connect(self.settingsDialog)
@@ -449,6 +455,7 @@ class MainWindow(QMainWindow):
         file_menu.addAction(new_act)
         file_menu.addAction(open_act)
         file_menu.addAction(book_act)
+        file_menu.addAction(pdf_act)
         file_menu.addSeparator()
         file_menu.addAction(settings_act)
         file_menu.addSeparator()
@@ -697,3 +704,6 @@ class MainWindow(QMainWindow):
         html += "\n</body>\n</html>"
         html = addLineNumbers(html)
         self.htmlReady.emit(html)
+
+    def pdfExport(self):
+        p = PdfExport("test.pdf", self.book, self.statusBar())
