@@ -22,6 +22,8 @@ import os
 import uuid
 import datetime
 import shutil
+import traceback
+import sys
 from tempfile import mkdtemp
 from shutil import rmtree
 from markdown2 import markdown
@@ -48,6 +50,7 @@ def createEpub(output, book, win):
     generatePackage(dir, book, guid)
     toc = generateParts(dir, book)
     generateToc(dir, book, toc)
+    generateNcx(dir, book, guid)
 
     os.chdir(dir)
     files = getAllFiles(dir)
@@ -267,3 +270,32 @@ def generateToc(dir, book, parts):
     xhtml = tmp.render(context)
     with open(os.path.join(dir, "EPUB", "parts", "toc.xhtml"), "w") as f:
         f.write(xhtml)
+
+
+def generateNcx(dir, book, uuid):
+    items = []
+    context = {}
+    context["title"] = book.name
+    context["uuid"] = uuid
+    order = 0
+    for part in book._parts:
+        order += 1
+        item = {}
+        name = part.name.replace(" ", "-")
+        item["href"] = os.path.join("parts", name.lower() + ".xhtml")
+        item["id"] = "navPoint-" + str(order)
+        item["name"] = name
+        item["order"] = str(order)
+        items.append(item)
+    context["items"] = items
+
+    try:
+        path = os.getcwd()
+        with open(os.path.join(path, "themes", book.theme, "layout", "toc.ncx")) as fp:
+            data = fp.read()
+        tmp = Template(data)
+        xhtml = tmp.render(context)
+        with open(os.path.join(dir, "EPUB", "toc.ncx"), "w") as f:
+            f.write(xhtml)
+    except:
+        traceback.print_exc(file=sys.stdout)

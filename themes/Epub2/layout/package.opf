@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="2.0" unique-identifier="BookId" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <dc:identifier id="BookId" opf:scheme="UUID">urn:uuid:{{ uuid }}</dc:identifier>
+    <dc:language>{{ lang }}</dc:language>
+    <dc:title>{{ title }}</dc:title>
+    <dc:date opf:event="modification" xmlns:opf="http://www.idpf.org/2007/opf">{{ date }}</dc:date>
+  </metadata>
+  <manifest>
+      <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+      <item href="parts/toc.xhtml" id="nav" media-type="application/xhtml+xml"/>{% for item in items %}
+      <item href="{{ item.href }}" id="{{ item.id }}" media-type="{{ item.type }}"/>{% endfor %}
+      <item href="css/pastie.css" media-type="text/css" id="hilite"/>
+      <item href="css/stylesheet.css" media-type="text/css" id="css"/> 
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="nav"/>{% for item in spine %}
+    <itemref idref="{{ item }}"/>{% endfor %}
+  </spine>
+  <guide>
+    <reference type="toc" title="Table of Contents" href="parts/toc.xhtml"/>
+  </guide>
+</package>
+
+

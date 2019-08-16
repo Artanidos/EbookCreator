@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link href="../css/pastie.css" rel="stylesheet" type="text/css"/>
+<link href="../css/stylesheet.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <h1>Table of Contents</h1>
+    <ol>
+      {% for a in parts %}
+      <li id="{{ a.id }}"><a href="{{ a.href }}">{{ a.name }}</a>
+        {% if a.parts %}
+        <ol>
+          {% for b in a.parts %}
+          <li><a href="{{ b.href }}">{{ b.name }}</a>
+            {% if b.parts %}
+            <ol>
+              {% for c in b.parts %}
+              <li><a href="{{ c.href }}">{{ c.name }}</a>
+                {% if c.parts %}
+                <ol>
+                  {% for d in c.parts %}
+                  <li><a href="{{ d.href }}">{{ d.name }}</a>
+                    {% if d.parts %}
+                    <ol>
+                      {% for e in d.parts %}
+                      <li><a href="{{ e.href }}">{{ e.name }}</a>
+                        {% if e.parts %}
+                        <ol>
+                          {% for f in e.parts %}
+                          <li><a href="{{ f.href }}">{{ f.name }}</a>
+                          </li>
+                          {% endfor %}
+                        </ol>
+                        {% endif %}
+                      </li>
+                      {% endfor %}
+                    </ol>
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                </ol>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ol>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+</body>
+</html>
