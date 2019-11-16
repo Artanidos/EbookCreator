@@ -56,6 +56,7 @@ class MainWindow(QMainWindow):
     def __init__(self, app):
         QMainWindow.__init__(self)
         self.install_directory = os.getcwd()
+
         self.app = app
         self.book = None
         self.last_book = ""
