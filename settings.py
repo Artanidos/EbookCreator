@@ -18,6 +18,9 @@
 #
 #############################################################################
 
+import os
+import shutil
+from shutil import rmtree
 from PyQt5.QtCore import (QCoreApplication, QParallelAnimationGroup,
                           QPropertyAnimation, Qt, pyqtProperty, pyqtSignal)
 from PyQt5.QtGui import QColor, QImage, QPalette, QPixmap
@@ -26,10 +29,11 @@ from PyQt5.QtWidgets import QDialog, QHBoxLayout, QLabel, QGridLayout, QComboBox
 
 class Settings(QDialog):
 
-    def __init__(self, book, parent = None):
+    def __init__(self, book, install_directory, parent = None):
         super(Settings, self).__init__(parent)
         self.book = book
         self.saved = False
+        self.install_directory = install_directory
         self.setWindowTitle(QCoreApplication.applicationName() + " - Book Settings")
         button_layout = QHBoxLayout()
         self.ok_button = QPushButton("Ok")
@@ -54,7 +58,12 @@ class Settings(QDialog):
         self.language.addItem("fr")
         self.language.setEditText(book.language)
         self.theme = QComboBox()
-        self.theme.addItem("default")
+        dir = os.path.join(install_directory, "themes")
+        for r, dirs, f in os.walk(dir):
+            if r == dir:
+                for d in dirs:
+                    self.theme.addItem(d)
+        self.theme.setCurrentText(book.theme)
         layout.addWidget(QLabel("Title"), 0, 0)
         layout.addWidget(self.title, 0, 1, 1, 3)
         layout.addWidget(QLabel("Creator"), 1, 0)
@@ -74,10 +83,16 @@ class Settings(QDialog):
         self.theme.currentIndexChanged.connect(self.textChanged)
 
     def okClicked(self):
-        self.book.name = self.title.text()
+        if self.book.name != self.title.text():
+            self.book.name = self.title.text()
         self.book.creator = self.creator.text()
         self.book.language = self.language.currentText()
-        self.book.theme = self.theme.currentText()
+        if self.book.theme != self.theme.currentText:
+            self.book.theme = self.theme.currentText()
+            #copy theme files
+            rmtree(os.path.join(self.book.source_path, "css"))
+            shutil.copytree(os.path.join(self.install_directory, "themes", self.book.theme, "assets", "css"), os.path.join(self.book.source_path, "css"))
+
         self.book.save()
         self.saved = True
         self.close()

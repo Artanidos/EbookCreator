@@ -17,5 +17,10 @@
         <file>images/up.svg</file>
         <file>images/wizard.svg</file>
         <file>images/edit.svg</file>
+        <file>images/á.svg</file>
+        <file>images/ã.svg</file>
+        <file>images/é.svg</file>
+        <file>images/ê.svg</file>
+        <file>images/ó.svg</file>
     </qresource>
 </RCC>

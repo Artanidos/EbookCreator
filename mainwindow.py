@@ -204,7 +204,7 @@ class MainWindow(QMainWindow):
         self.paste_act.setEnabled(md.hasText())
 
     def openSettings(self):
-        dlg = Settings(self.book)
+        dlg = Settings(self.book, self.install_directory)
         dlg.exec()
         if dlg.saved:
             self.setWindowTitle(QCoreApplication.applicationName() + " - " + self.book.name)
@@ -371,6 +371,11 @@ class MainWindow(QMainWindow):
         italic_icon = QIcon(QPixmap(":/images/italic.svg"))
         image_icon = QIcon(QPixmap(":/images/image.svg"))
         table_icon = QIcon(QPixmap(":/images/table.svg"))
+        á_icon = QIcon(QPixmap(":/images/á.svg"))
+        ã_icon = QIcon(QPixmap(":/images/ã.svg"))
+        é_icon = QIcon(QPixmap(":/images/é.svg"))
+        ê_icon = QIcon(QPixmap(":/images/ê.svg"))
+        ó_icon = QIcon(QPixmap(":/images/ó.svg"))
 
         new_act = QAction(new_icon, "&New", self)
         new_act.setShortcuts(QKeySequence.New)
@@ -448,6 +453,26 @@ class MainWindow(QMainWindow):
         table_act.triggered.connect(self.insertTable)
         table_act.setToolTip("Insert a table")
 
+        á_act = QAction(á_icon, "á", self)
+        á_act.triggered.connect(self.insertLetterA1)
+        á_act.setToolTip("Insert letter á")
+
+        ã_act = QAction(ã_icon, "ã", self)
+        ã_act.triggered.connect(self.insertLetterA2)
+        ã_act.setToolTip("Insert letter ã")
+
+        é_act = QAction(é_icon, "é", self)
+        é_act.triggered.connect(self.insertLetterE1)
+        é_act.setToolTip("Insert letter é")
+
+        ê_act = QAction(ê_icon, "ê", self)
+        ê_act.triggered.connect(self.insertLetterE2)
+        ê_act.setToolTip("Insert letter ê")
+
+        ó_act = QAction(ó_icon, "ó", self)
+        ó_act.triggered.connect(self.insertLetterO1)
+        ó_act.setToolTip("Insert letter ó")
+
         about_act = QAction("&About", self)
         about_act.triggered.connect(self.about)
         about_act.setStatusTip("Show the application's About box")
@@ -493,6 +518,11 @@ class MainWindow(QMainWindow):
         insert_toolbar = self.addToolBar("Insert")
         insert_toolbar.addAction(image_act)
         insert_toolbar.addAction(table_act)
+        insert_toolbar.addAction(á_act)
+        insert_toolbar.addAction(ã_act)
+        insert_toolbar.addAction(é_act)
+        insert_toolbar.addAction(ê_act)
+        insert_toolbar.addAction(ó_act)
 
     def doUndo(self):
         self.text_edit.undo()
@@ -540,6 +570,41 @@ class MainWindow(QMainWindow):
                           "|  cell a   |   cell b    |   cell c  |   cell d   |\n"
                           "|  cell e   |   cell f    |   cell g  |   cell h   |\n")
         cursor.setPosition(pos)
+        self.text_edit.setTextCursor(cursor)
+
+    def insertLetterA1(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        cursor.insertText("á")
+        cursor.setPosition(pos + 1)
+        self.text_edit.setTextCursor(cursor)
+
+    def insertLetterA2(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        cursor.insertText("ã")
+        cursor.setPosition(pos + 1)
+        self.text_edit.setTextCursor(cursor)
+
+    def insertLetterE1(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        cursor.insertText("é")
+        cursor.setPosition(pos + 1)
+        self.text_edit.setTextCursor(cursor)
+
+    def insertLetterE2(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        cursor.insertText("ê")
+        cursor.setPosition(pos + 1)
+        self.text_edit.setTextCursor(cursor)
+
+    def insertLetterO1(self):
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        cursor.insertText("ó")
+        cursor.setPosition(pos + 1)
         self.text_edit.setTextCursor(cursor)
 
     def createStatusBar(self):

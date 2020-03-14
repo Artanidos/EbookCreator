@@ -44,8 +44,8 @@ class ProjectWizard(QWizard):
         theme = self.field("theme")
         creator = self.field("creator")
         path = os.path.join(self.install_directory, "sources", projectName.replace(" ", "").lower())
-
-        os.mkdir(os.path.join(self.install_directory, "sources"))
+        if not os.path.exists(os.path.join(self.install_directory, "sources")):
+            os.mkdir(os.path.join(self.install_directory, "sources"))
         os.mkdir(path)
         os.mkdir(os.path.join(path, "parts"))
         os.mkdir(os.path.join(path, "images"))
@@ -122,9 +122,11 @@ class ProjectInfoPage(QWizardPage):
         self.themeLabel = QLabel("&Theme")
         self.theme = QComboBox()
         self.themeLabel.setBuddy(self.theme)
-        # todo, add additional themes here, reading directory
-        self.theme.addItem("Epub2")
-        self.theme.addItem("Epub3")
+        dir = os.path.join(install_directory, "themes")
+        for r, dirs, f in os.walk(dir):
+            if r == dir:
+                for d in dirs:
+                    self.theme.addItem(d)
 
         self.registerField("projectName*", self.projectNameLineEdit)
         self.registerField("creator*", self.creatorNameLineEdit)
