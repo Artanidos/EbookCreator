@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
 
     def initTheme(self):
         settings = QSettings(QSettings.IniFormat, QSettings.UserScope, QCoreApplication.organizationName(), QCoreApplication.applicationName())
-        self.theme = settings.value("theme", "Fusion")
+        self.theme = settings.value("theme", "DarkFusion")
         hilite_color = settings.value("hiliteColor", self.palette().highlight().color().name())
         self.changeStyle(self.theme, hilite_color)
 
@@ -166,7 +166,7 @@ class MainWindow(QMainWindow):
 
         self.splitter = QSplitter()
         self.text_edit = MarkdownEdit()
-        self.text_edit.setFont(QFont("Courier", 11))
+        self.text_edit.setFont(QFont("Courier", 17))
         self.preview = QWebEngineView()
         self.preview.setMinimumWidth(300)
         self.setWindowTitle(QCoreApplication.applicationName())
