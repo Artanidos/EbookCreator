@@ -22,6 +22,7 @@ import sys
 import os
 from pathlib import Path
 from shutil import copy
+from autocorrect import Speller
 from threading import Thread, Lock
 from markdown2 import markdown
 from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
@@ -166,7 +167,7 @@ class MainWindow(QMainWindow):
 
         self.splitter = QSplitter()
         self.text_edit = MarkdownEdit()
-        self.text_edit.setFont(QFont("Courier", 17))
+        self.text_edit.setFont(QFont("Courier", 11))
         self.preview = QWebEngineView()
         self.preview.setMinimumWidth(300)
         self.setWindowTitle(QCoreApplication.applicationName())
@@ -477,6 +478,11 @@ class MainWindow(QMainWindow):
         about_act.triggered.connect(self.about)
         about_act.setStatusTip("Show the application's About box")
 
+        spell_act = QAction("&Spellcheck", self)
+        spell_act.setShortcut(Qt.CTRL + Qt.Key_P)
+        spell_act.triggered.connect(self.spellCheck)
+        spell_act.setStatusTip("Spellcheck")
+
         file_menu = self.menuBar().addMenu("&File")
         file_menu.addAction(new_act)
         file_menu.addAction(open_act)
@@ -505,6 +511,7 @@ class MainWindow(QMainWindow):
 
         help_menu = self.menuBar().addMenu("&Help")
         help_menu.addAction(about_act)
+        help_menu.addAction(spell_act)
 
         file_tool_bar = self.addToolBar("File")
         file_tool_bar.addAction(new_act)
@@ -742,16 +749,17 @@ class MainWindow(QMainWindow):
             msgBox.exec()
 
     def textChanged(self):
+        text = self.text_edit.toPlainText()
         if self.filename:
             with open(self.filename, "w") as f:
-                f.write(self.text_edit.toPlainText())
+                f.write(text)
 
         self.lock = Lock()
         with self.lock:
             if not self.tread_running:
                 self.tread_running = True
                 self.htmlReady.connect(self.previewReady)
-                thread = Thread(target=self.createHtml, args=(self.text_edit.toPlainText(),))
+                thread = Thread(target=self.createHtml, args=(text,))
                 thread.daemon = True
                 thread.start()
 
@@ -772,4 +780,18 @@ class MainWindow(QMainWindow):
         self.htmlReady.emit(html)
 
     def pdfExport(self):
-        p = PdfExport("test.pdf", self.book, self.statusBar())
+        p = PdfExport(self.book, self.statusBar())
+
+    def spellCheck(self):
+        if not self.filename:
+            QMessageBox.warning(self, QCoreApplication.applicationName(), "You have to select part from the book content first!")
+            return
+        cursor = self.text_edit.textCursor()
+        pos = cursor.position()
+        if not cursor.hasSelection():
+            cursor.select(QTextCursor.WordUnderCursor)
+        spell = Speller(lang='en')
+        changed = spell(cursor.selectedText())
+        if changed != cursor.selectedText():
+            cursor.insertText(changed)
+            self.text_edit.setTextCursor(cursor)

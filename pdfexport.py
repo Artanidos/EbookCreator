@@ -24,45 +24,52 @@ from markdown2 import markdown
 from generator import addLineNumbers
 from PyQt5.QtWebEngineWidgets import QWebEnginePage
 from PyQt5.QtGui import QPageLayout, QPageSize
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QFileDialog 
 from PyQt5.QtCore import Qt, QUrl
+from weasyprint import HTML, CSS
 
 
 class PdfExport():
-    def __init__(self, filename, book, status_bar):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        self.filename = filename
+    def __init__(self, book, status_bar):
         self.status_bar = status_bar
+        self.install_directory = os.getcwd()
+
+        filename = ""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setNameFilter("PDF (*.pdf);;All (*)")
+        dialog.setWindowTitle("Create PDF")
+        dialog.setOption(QFileDialog.DontUseNativeDialog, True)
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setDirectory(book.source_path)
+        dialog.setDefaultSuffix("pdf")
+        if dialog.exec_():
+            filename = dialog.selectedFiles()[0]
+        del dialog
+        if not filename:
+            return
         
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         html = "<html>\n<head>\n"
-        html += "<link href=\"../css/pastie.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-        html += "<link href=\"../css/stylesheet.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+        html += "<link href=\"file://" + os.path.join(book.source_path, "css", "pastie.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+        html += "<link href=\"file://" + os.path.join(book.source_path, "css", "stylesheet.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>\n"
         html += "</head>\n<body>\n"
+        partNo = 1
         for part in book._parts:
             self.status_bar.showMessage("Processing " + part.name)
             with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
                 text = i.read()
                 htm = markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"])
                 htm = addLineNumbers(htm)
-                html += htm
+                # fix img tags
+                book.source_path
+                html += htm.replace("../images", "file://" + os.path.join(book.source_path, "images"))
+                if partNo < len(book._parts):
+                    html += "<p style=\"page-break-before: always\">"
+                partNo += 1
         html += "\n</body>\n</html>"
-
-        self.status_bar.showMessage("Loading HTML")
-        self.page = QWebEnginePage()
-        self.page.loadFinished.connect(self.loadFinished)
-        self.page.pdfPrintingFinished.connect(self.printFinished)
-        self.page.setHtml(html, QUrl(Path(os.path.join(book.source_path, "parts", "index.html")).as_uri()))
-
-    def loadFinished(self, ok):
-        if ok:
-            self.status_bar.showMessage("Printing PDF")
-            self.page.printToPdf(self.filename, pageLayout=QPageLayout(QPageSize(QPageSize.A5), QPageLayout.Portrait, QMarginsF(30.0, 30.0, 30.0, 30.0)))
-        else:
-            self.status_bar.showMessage("There was an error printing the PDF")
-
-    def printFinished(self, filename, success):
+        h = HTML(string=html)
+        css = CSS(string='@page { size: A5; margin: 0cm }')
+        h.write_pdf(filename, stylesheets=[css])
+        self.status_bar.showMessage("Ready")
         QApplication.restoreOverrideCursor()
-        if success:
-            self.status_bar.showMessage("PDF created")
-        else:
-            self.status_bar.showMessage("There was an error printing the PDF")

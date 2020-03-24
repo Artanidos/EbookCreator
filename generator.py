@@ -290,6 +290,7 @@ def generateNcx(dir, book, uuid):
     context["items"] = items
 
     try:
+        # only relevant for epub2
         path = os.getcwd()
         with open(os.path.join(path, "themes", book.theme, "layout", "toc.ncx")) as fp:
             data = fp.read()
