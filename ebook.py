@@ -145,5 +145,7 @@ class Ebook(QObject):
                 f.write("    Part {\n")
                 f.write("        src: \"" + part.src + "\"\n")
                 f.write("        name: \"" + part.name + "\"\n")
+                if part.pdfOnly:
+                    f.write("        pdfOnly: true\n")
                 f.write("    }\n")
             f.write("}\n")

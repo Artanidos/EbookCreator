@@ -28,6 +28,7 @@ class Part(QObject):
         super().__init__(parent)
         self._name = ""
         self._src = ""
+        self._pdfOnly = False
 
     @pyqtProperty('QString')
     def name(self):
@@ -44,3 +45,11 @@ class Part(QObject):
     @src.setter
     def src(self, src):
         self._src = src
+
+    @pyqtProperty('bool')
+    def pdfOnly(self):
+        return self._pdfOnly
+
+    @pdfOnly.setter
+    def pdfOnly(self, pdfOnly):
+        self._pdfOnly = pdfOnly

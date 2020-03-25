@@ -1,3 +1,6 @@
+#1.2.0
+- PDF export added
+
 #1.1.1
 - Added line-number for code segements
 

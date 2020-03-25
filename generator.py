@@ -102,13 +102,14 @@ def generatePackage(dir, book, uuid):
     spine = []
 
     for part in book._parts:
-        item = {}
-        name = part.name.replace(" ", "-").lower()
-        item["href"] = os.path.join("parts", name + ".xhtml")
-        item["id"] = name
-        item["type"] = "application/xhtml+xml"
-        items.append(item)
-        spine.append(name)
+        if not part.pdfOnly:
+            item = {}
+            name = part.name.replace(" ", "-").lower()
+            item["href"] = os.path.join("parts", name + ".xhtml")
+            item["id"] = name
+            item["type"] = "application/xhtml+xml"
+            items.append(item)
+            spine.append(name)
 
     for root, dirs, files in os.walk(os.path.join(dir, "EPUB", "images")):
         for file in files:
@@ -150,21 +151,22 @@ def generateParts(dir, book):
     toc.append(item)
     path = os.getcwd()
     for part in book._parts:
-        context = {}
-        with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
-            text = i.read()
-        name = part.name.replace(" ", "-").lower()
-        html = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
-        list = getLinks(html, name)
-        for item in list:
-            toc.append(item)
-        context["content"] = html
-        with open(os.path.join(path, "themes", book.theme, "layout", "template.xhtml")) as fp:
-            data = fp.read()
-        tmp = Template(data)
-        xhtml = tmp.render(context)
-        xhtml = addLineNumbers(xhtml)
-        with open(os.path.join(dir, "EPUB", "parts", name + ".xhtml"), "w") as f:
+        if not part.pdfOnly:
+            context = {}
+            with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
+                text = i.read()
+            name = part.name.replace(" ", "-").lower()
+            html = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
+            list = getLinks(html, name)
+            for item in list:
+                toc.append(item)
+            context["content"] = html
+            with open(os.path.join(path, "themes", book.theme, "layout", "template.xhtml")) as fp:
+                data = fp.read()
+            tmp = Template(data)
+            xhtml = tmp.render(context)
+            xhtml = addLineNumbers(xhtml)
+            with open(os.path.join(dir, "EPUB", "parts", name + ".xhtml"), "w") as f:
                 f.write(xhtml)
     return toc
 
@@ -279,14 +281,15 @@ def generateNcx(dir, book, uuid):
     context["uuid"] = uuid
     order = 0
     for part in book._parts:
-        order += 1
-        item = {}
-        name = part.name.replace(" ", "-")
-        item["href"] = os.path.join("parts", name.lower() + ".xhtml")
-        item["id"] = "navPoint-" + str(order)
-        item["name"] = name
-        item["order"] = str(order)
-        items.append(item)
+        if not part.pdfOnly:
+            order += 1
+            item = {}
+            name = part.name.replace(" ", "-")
+            item["href"] = os.path.join("parts", name.lower() + ".xhtml")
+            item["id"] = "navPoint-" + str(order)
+            item["name"] = name
+            item["order"] = str(order)
+            items.append(item)
     context["items"] = items
 
     try:
