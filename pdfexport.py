@@ -139,7 +139,7 @@ def getLinks(text, part_name):
             end = line.find("<", start + 1)
             name = line[start:end]
             item = {}
-            item["href"] = part_name + ".xhtml#" + id
+            item["href"] = "#" + id
             item["name"] = name
             item["id"] = id
             item["parts"] = []
@@ -157,7 +157,7 @@ def generateToc(book, parts):
     path = os.getcwd()
     context = {}
     context["parts"] = parts
-    with open(os.path.join(path, "themes", book.theme, "layout", "toc.xhtml"), "r") as fp:
+    with open(os.path.join(path, "themes", book.theme, "layout", "toc_pdf.xhtml"), "r") as fp:
         data = fp.read()
     tmp = Template(data)
     xhtml = tmp.render(context)
