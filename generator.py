@@ -116,7 +116,7 @@ def generatePackage(dir, book, uuid):
             filename, extension = os.path.splitext(file)
             item = {}
             item["href"] = os.path.join("images", file)
-            item["id"] = filename
+            item["id"] = filename +"_img"
             item["type"] = "image/" + extension[1:]
             items.append(item)
 
