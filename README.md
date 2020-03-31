@@ -34,5 +34,5 @@ To export the book as epub just click the create button and choose a filename an
 ## Patreon
 If you like to support my work on the AnimationMaker you are invited to become a patreon.  
 
-[https://patreon.com/artanidos](https://patreon.com/artanidos)
+[https://www.patreon.com/artananda](https://www.patreon.com/artananda)
 
