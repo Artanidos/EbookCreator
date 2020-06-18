@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid">
+   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <dc:identifier id="uid">{{ uuid }}</dc:identifier>
+      <dc:title>{{ title }}</dc:title>
+      <dc:creator>{{ creator }}</dc:creator>
+      <dc:language>{{ lang }}</dc:language>
+      <meta property="dcterms:modified">{{ date }}</meta>
+   </metadata>
+   <manifest>
+      <item href="parts/toc.xhtml" id="nav" media-type="application/xhtml+xml" properties="nav"/>{% for item in items %}
+      <item href="{{ item.href }}" id="{{ item.id }}" media-type="{{ item.type }}"/>{% endfor %}
+      <item href="css/pastie.css" media-type="text/css" id="hilite"/>
+      <item href="css/stylesheet.css" media-type="text/css" id="css"/>
+   </manifest>
+   <spine>
+      <itemref idref="nav"/>{% for item in spine %}
+      <itemref idref="{{ item }}"/>{% endfor %}
+   </spine>
+</package>
+

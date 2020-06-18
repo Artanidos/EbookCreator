@@ -71,7 +71,10 @@ def generateParts(book, xhtml):
     toc = []
     item = {}
     item["href"] = "toc.xhtml"
-    item["name"] = "Table of Contents"
+    if book.language == "de":
+        item["name"] = "Inhaltsverzeichnis"
+    else:
+        item["name"] = "Table of Contents"
     item["id"] = "nav"
     item["parts"] = []
     toc.append(item)

@@ -689,7 +689,7 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle("Create Ebook")
         dialog.setOption(QFileDialog.DontUseNativeDialog, True)
         dialog.setAcceptMode(QFileDialog.AcceptSave)
-        dialog.setDirectory(self.install_directory)
+        dialog.setDirectory(self.book.source_path)
         dialog.setDefaultSuffix("epub")
         if dialog.exec_():
             filename = dialog.selectedFiles()[0]
