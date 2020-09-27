@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright (C) 2019 Olaf Japp
+# Copyright (C) 2020 Olaf Japp
 #
 # This file is part of EbookCreator.
 #
@@ -62,22 +62,13 @@ class PdfExport():
         html += htm
         html += "\n</body>\n</html>"
         h = HTML(string=html)
-        css = CSS(string='@page { size: A5; margin: 0cm }')
+        css = CSS(string='@page { size: ' + book.size + '; margin: 0cm }')
         h.write_pdf(filename, stylesheets=[css])
         QApplication.restoreOverrideCursor()
         self.status_bar.showMessage("Ready")
 
 def generateParts(book, xhtml):
     toc = []
-    item = {}
-    item["href"] = "toc.xhtml"
-    if book.language == "de":
-        item["name"] = "Inhaltsverzeichnis"
-    else:
-        item["name"] = "Table of Contents"
-    item["id"] = "nav"
-    item["parts"] = []
-    toc.append(item)
 
     partNo = 1
     html = ""
@@ -85,21 +76,32 @@ def generateParts(book, xhtml):
         with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
             text = i.read()
         name = part.name.replace(" ", "-").lower()
-        htm = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
-        list = getLinks(htm, name)
-        for item in list:
-            toc.append(item)
-        htm = addLineNumbers(htm)
-        # fix img tags
-        book.source_path
-        htm = htm.replace("../images", "file://" + os.path.join(book.source_path, "images"))
-        if partNo < len(book._parts):
-            htm += "<p style=\"page-break-before: always\">"
-        # should be true for cover page
-        if part.pdfOnly:
-            xhtml += htm
+        if name == "toc":
+            toc_item = {}
+            toc_item["href"] = "toc.xhtml"
+            if book.language == "de":
+                toc_item["name"] = "Inhaltsverzeichnis"
+            else:
+                toc_item["name"] = "Table of Contents"
+            toc_item["id"] = "nav"
+            toc_item["parts"] = []
+            toc.append(toc_item)
         else:
-            html += htm
+            htm = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
+            list = getLinks(htm, name)
+            for item in list:
+                toc.append(item)
+            htm = addLineNumbers(htm)
+            # fix img tags
+            book.source_path
+            htm = htm.replace("../images", "file://" + os.path.join(book.source_path, "images"))
+            if partNo < len(book._parts):
+                htm += "<p style=\"page-break-before: always\">"
+            # should be true for cover page
+            if part.pdfOnly:
+                xhtml += htm
+            else:
+                html += htm
         partNo += 1
         
     return toc, html, xhtml

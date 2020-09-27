@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright (C) 2019 Olaf Japp
+# Copyright (C) 2020 Olaf Japp
 #
 # This file is part of EbookCreator.
 #
@@ -34,6 +34,7 @@ class Ebook(QObject):
         self._language = ""
         self._creator = ""
         self._publisher = ""
+        self._size = ""
         self._parts = []
         self.filename = ""
         self.source_path = ""
@@ -82,6 +83,14 @@ class Ebook(QObject):
     @publisher.setter
     def publisher(self, publisher):
         self._publisher = publisher
+
+    @pyqtProperty('QString')
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, size):
+        self._size = size
 
     def setFilename(self, filename):
         info = QFileInfo(filename)
@@ -139,6 +148,7 @@ class Ebook(QObject):
             f.write("Ebook {\n")
             f.write("    name: \"" + self._name + "\"\n")
             f.write("    language: \"" + self._language + "\"\n")
+            f.write("    size: \"" + self._size + "\"\n")
             f.write("    theme: \"" + self._theme + "\"\n")
             f.write("    creator: \"" + self._creator + "\"\n")
             for part in self._parts:

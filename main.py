@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright (C) 2019 Olaf Japp
+# Copyright (C) 2020 Olaf Japp
 #
 # This file is part of EbookCreator.
 #
@@ -34,9 +34,9 @@ if __name__ == "__main__":
     sys.argv.append("--disable-web-security")
 
     app = QApplication(sys.argv)
-    QCoreApplication.setOrganizationName("Artanidos")
+    QCoreApplication.setOrganizationName("CrowdWare")
     QCoreApplication.setApplicationName("EbookCreator")
-    QCoreApplication.setApplicationVersion("1.2.1")
+    QCoreApplication.setApplicationVersion("1.3.0")
 
     app.setStyle(QStyleFactory.create("Fusion"))
 

@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright (C) 2019 Olaf Japp
+# Copyright (C) 2020 Olaf Japp
 #
 # This file is part of EbookCreator.
 #
@@ -23,8 +23,10 @@ import os
 from pathlib import Path
 from shutil import copy
 from autocorrect import Speller
+import inspect
 from threading import Thread, Lock
 from markdown2 import markdown
+from importlib import import_module
 from PyQt5.QtCore import (QByteArray, QCoreApplication, QPropertyAnimation,
                           QSettings, Qt, QUrl, QSize, pyqtSignal, QMarginsF)
 from PyQt5.QtGui import (QColor, QFont, QIcon, QKeySequence, QPalette,
@@ -40,6 +42,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QDockWidget,
 from ebook import Ebook
 from expander import Expander
 from flatbutton import FlatButton
+from plugin import Plugins
 from generator import createEpub, addLineNumbers
 from hyperlink import HyperLink
 from markdownedit import MarkdownEdit
@@ -48,6 +51,9 @@ from settings import Settings
 from dark import DarkFusion
 from settingsdialog import SettingsDialog
 from pdfexport import PdfExport
+from interfaces import GeneratorInterface
+from plugins.calendar import CalendarGenerator
+
 import resources
 
 
@@ -66,9 +72,11 @@ class MainWindow(QMainWindow):
         self.tread_running = False
         self.initTheme()
         self.createUi()
+        self.loadPlugins()
         self.createMenus()
         self.createStatusBar()
         self.readSettings()
+        
         self.text_edit.textChanged.connect(self.textChanged)
 
     def initTheme(self):
@@ -321,7 +329,8 @@ class MainWindow(QMainWindow):
             part = item.data(1)
             self.filename = os.path.join(self.book.source_path, "parts", part.src)
             with open(self.filename, "r") as f:
-                self.text_edit.setText(f.read())
+                t = f.read()
+                self.text_edit.setPlainText(t)
             self.trash_button.enabled = True
             self.up_button.enabled = self.content_list.currentRow() > 0
             self.down_button.enabled = self.content_list.currentRow() < self.content_list.count() - 1
@@ -509,6 +518,15 @@ class MainWindow(QMainWindow):
         insert_menu.addAction(image_act)
         insert_menu.addAction(table_act)
 
+        for key in Plugins.generatorPluginNames():
+            gen = Plugins.getGeneratorPlugin(key)
+            if gen:
+                act = QAction(gen.display_name, self)
+                #act.triggered.connect(self.insertTable)
+                #act.setToolTip("Insert a table")
+                insert_menu.addAction(act)
+                act.triggered.connect(gen.menu_action)
+
         help_menu = self.menuBar().addMenu("&Help")
         help_menu.addAction(about_act)
         help_menu.addAction(spell_act)
@@ -618,7 +636,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Ready")
 
     def about(self):
-        QMessageBox.about(self, "About " + QCoreApplication.applicationName(), "EbookCreator\nVersion: " + QCoreApplication.applicationVersion() + "\n(C) Copyright 2019 Olaf Japp. All rights reserved.\n\nThis program is provided AS IS with NO\nWARRANTY OF ANY KIND, INCLUDING THE\nWARRANTY OF DESIGN, MERCHANTABILITY AND\nFITNESS FOR A PATICULAR PURPOSE.")
+        QMessageBox.about(self, "About " + QCoreApplication.applicationName(), "EbookCreator\nVersion: " + QCoreApplication.applicationVersion() + "\n(C) Copyright 2020 CrowdWare. All rights reserved.\n\nThis program is provided AS IS with NO\nWARRANTY OF ANY KIND, INCLUDING THE\nWARRANTY OF DESIGN, MERCHANTABILITY AND\nFITNESS FOR A PATICULAR PURPOSE.")
 
     def newFile(self):
         dlg = ProjectWizard(self.install_directory, parent = self)
@@ -795,3 +813,33 @@ class MainWindow(QMainWindow):
         if changed != cursor.selectedText():
             cursor.insertText(changed)
             self.text_edit.setTextCursor(cursor)
+
+    def loadPlugins(self):
+        # check if we are running in a frozen environment (pyinstaller --onefile)
+        if getattr(sys, "frozen", False):
+            bundle_dir = sys._MEIPASS
+            # if we are running in a onefile environment, then copy all plugin to /tmp/...
+            if bundle_dir != os.getcwd():
+                os.mkdir(os.path.join(bundle_dir, "plugins"))
+                for root, dirs, files in os.walk(os.path.join(os.getcwd(), "plugins")):
+                    for file in files:
+                        shutil.copy(os.path.join(root, file), os.path.join(bundle_dir, "plugins"))
+                        print("copy", file)
+                    break # do not copy __pycache__
+        else:
+            bundle_dir = os.getcwd()
+        
+        plugins_dir = os.path.join(bundle_dir, "plugins")
+        for root, dirs, files in os.walk(plugins_dir):
+            for file in files:
+                modulename, ext = os.path.splitext(file)
+                if ext == ".py":
+                    module = import_module("plugins." + modulename)
+                    for name, klass in inspect.getmembers(module, inspect.isclass):
+                        if klass.__module__ == "plugins." + modulename:
+                            instance = klass()
+                            if isinstance(instance, GeneratorInterface):
+                                Plugins.addGeneratorPlugin(name, instance)
+                                instance.setTextEdit(self.text_edit)
+                                #instance.registerContenType()
+            break # not to list __pycache__

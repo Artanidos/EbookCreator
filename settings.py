@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright (C) 2019 Olaf Japp
+# Copyright (C) 2020 Olaf Japp
 #
 # This file is part of EbookCreator.
 #
@@ -64,6 +64,12 @@ class Settings(QDialog):
                 for d in dirs:
                     self.theme.addItem(d)
         self.theme.setCurrentText(book.theme)
+        self.size = QComboBox()
+        self.size.setEditable(True)
+        self.size.addItem("A5")
+        self.size.addItem("A4")
+        self.size.addItem("A3")
+        self.size.setEditText(book.size)
         layout.addWidget(QLabel("Title"), 0, 0)
         layout.addWidget(self.title, 0, 1, 1, 3)
         layout.addWidget(QLabel("Creator"), 1, 0)
@@ -72,7 +78,9 @@ class Settings(QDialog):
         layout.addWidget(self.language, 2, 1)
         layout.addWidget(QLabel("Theme"), 3, 0)
         layout.addWidget(self.theme, 3, 1)
-        layout.addLayout(button_layout, 4, 0, 1, 4)
+        layout.addWidget(QLabel("Pagesize (PDF)"), 4, 0)
+        layout.addWidget(self.size, 4, 1)
+        layout.addLayout(button_layout, 5, 0, 1, 4)
         self.setLayout(layout)
 
         self.ok_button.clicked.connect(self.okClicked)
@@ -81,12 +89,14 @@ class Settings(QDialog):
         self.creator.textChanged.connect(self.textChanged)
         self.language.editTextChanged.connect(self.textChanged)
         self.theme.currentIndexChanged.connect(self.textChanged)
+        self.size.editTextChanged.connect(self.textChanged)
 
     def okClicked(self):
         if self.book.name != self.title.text():
             self.book.name = self.title.text()
         self.book.creator = self.creator.text()
         self.book.language = self.language.currentText()
+        self.book.size = self.size.currentText()
         if self.book.theme != self.theme.currentText:
             self.book.theme = self.theme.currentText()
             #copy theme files
