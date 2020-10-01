@@ -34,12 +34,18 @@ class CalendarGenerator(GeneratorInterface):
         text += '.square\n'
         text += '{\n'
         text += '    height: 50px;\n'
-        text += '    width: 100px;\n'
+        text += '    width: 60px;\n'
         text += '    border-style: solid;\n'
         text += '    border-width: 1px;\n'
         text += '    border-color: #000000;\n'
         text += '    margin: 5px;\n'
         text += '    padding: 10px;\n'
+        text += '    text-align: center;\n'
+        text += '}\n'
+        text += '.square span\n'
+        text += '{\n'
+        text += '    font-size: 30px;\n'
+        text += '    font-weight: bold;\n'
         text += '}\n'
         text += '.greg\n'
         text += '{\n'
@@ -54,43 +60,35 @@ class CalendarGenerator(GeneratorInterface):
         text += '.moon\n'
         text += '{\n'
         text += '    background-color: #ff6bcd;\n'
-        text += '    color: #FFFFFF;\n'
         text += '}\n'
         text += '.ocean\n'
         text += '{\n'
         text += '    background-color: #a7a7ff;\n'
-        text += '    color: #FFFFFF;\n'
         text += '}\n'
         text += '.heaven\n'
         text += '{\n'
         text += '    background-color: #96ffff;\n'
-        text += '    color: #000000;\n'
         text += '}\n'
         text += '.tree\n'
         text += '{\n'
         text += '    page-break-after: always;\n'
         text += '    background-color: #94ff94;\n'
-        text += '    color: #FFFFFF;\n'
         text += '}\n'
         text += '.sun\n'
         text += '{\n'
         text += '    background-color: #ffff7d;\n'
-        text += '    color: #000000;\n'
         text += '}\n'
         text += '.fire\n'
         text += '{\n'
         text += '    background-color: #ffad78;\n'
-        text += '    color: #000000;\n'
         text += '}\n'
         text += '.star\n'
         text += '{\n'
         text += '    background-color: #ff8a8a;\n'
-        text += '    color: #FFFFFF;\n'
         text += '}\n'
         text += '.earth\n'
         text += '{\n'
         text += '    background-color: #b8b8b8;\n'
-        text += '    color: #FFFFFF;\n'
         text += '}\n'
         text += '.note\n'
         text += '{\n'
@@ -142,7 +140,7 @@ class CalendarGenerator(GeneratorInterface):
         sday = 1
         dayInWeek = 1
         days = abs((lastdate - actdate).days) + 1
-        days = 20
+        #days = 18
         for weeks in range(1, days + 1):
             if dayInWeek == 1:
                 text += self.header(actdate)
@@ -150,7 +148,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square god">\n'
-                text += str(sday) + ' Hors\n'
+                text += '<span>' + str(sday) + '</span></br>Hors\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
             elif dayInWeek == 2:
@@ -158,7 +156,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square moon">\n'
-                text += str(sday) + ' Orea\n'
+                text += '<span>' + str(sday) + '</span></br>Orea\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
             elif dayInWeek == 3:
@@ -166,7 +164,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square ocean">\n'
-                text += str(sday) + ' Perun\n'
+                text += '<span>' + str(sday) + '</span></br>Perun\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
             elif dayInWeek == 4:
@@ -174,7 +172,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square heaven">\n'
-                text += str(sday) + ' Waruna\n'
+                text += '<span>' + str(sday) + '</span></br>Waruna\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
             elif dayInWeek == 5:
@@ -182,7 +180,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square tree">\n'
-                text += str(sday) + ' Indra\n'
+                text += '<span>' + str(sday) + '</span></br>Indra\n'
                 text += '</div>\n'
                 text += '<div class="header">\n'
                 text += '    <span class="center"><strong>' + actdate.strftime("%B") + '</strong></span>\n'
@@ -193,7 +191,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square sun">\n'
-                text += str(sday) + ' Stribog\n'
+                text += '<span>' + str(sday) + '</span></br>Stribog\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
             elif dayInWeek == 7:
@@ -201,7 +199,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square fire">\n'
-                text += str(sday) + ' Dea\n'
+                text += '<span>' + str(sday) + '</span></br>Dea\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
             elif dayInWeek == 8:
@@ -209,7 +207,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square star">\n'
-                text += str(sday) + ' Merzana\n'
+                text += '<span>' + str(sday) + '</span></br>Merzana\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
             elif dayInWeek == 9:
@@ -217,7 +215,7 @@ class CalendarGenerator(GeneratorInterface):
                 text += str(actdate.day) + ' ' + actdate.strftime("%A") + '\n'
                 text += '</div>\n'
                 text += '<div class="square earth">\n'
-                text += str(sday) + ' Jarilo\n'
+                text += '<span>' + str(sday) + '</span></br>Jarilo\n'
                 text += '</div>\n'
                 text += '<hr/>\n'
                 text += '<div class="square note">\n'
@@ -258,17 +256,17 @@ class CalendarDialog(QDialog):
         self.day = QComboBox()
         for d in range(1, 32):
             self.day.addItem(str(d))
-        self.day.setCurrentText(str(ad))
+        self.day.setCurrentText("21")
         self.month = QComboBox()
         for m in range(1, 13):
             self.month.addItem(str(m))
-        self.month.setCurrentText(str(am))
+        self.month.setCurrentText("9")
         self.year = QComboBox()
         for y in range(ay - 100, ay + 50):
             self.year.addItem(str(y))
-        self.year.setCurrentText(str(ay))
+        self.year.setCurrentText("2020")
         
-        layout.addWidget(QLabel("Please insert the first day of the calendar (21.09.2020)"), 0, 0, 1, 4)
+        layout.addWidget(QLabel("Please insert the first day of the calendar"), 0, 0, 1, 4)
         layout.addWidget(QLabel("  Day"), 1, 0)
         layout.addWidget(self.day, 1, 3, 1, 4)
         layout.addWidget(QLabel("  Month"), 2, 0)
