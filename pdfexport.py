@@ -52,17 +52,20 @@ class PdfExport():
             return
         
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        html = "<html>\n<head>\n"
-        html += "<link href=\"file://" + os.path.join(book.source_path, "css", "pastie.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-        html += "<link href=\"file://" + os.path.join(book.source_path, "css", "stylesheet.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-        html += "</head>\n<body>\n"
+        html = '<?xml version="1.0" encoding="utf-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">\n'
+        html += '<head>\n'
+        html += '<link href="file://' + os.path.join(book.source_path, "css", "pastie.css") + '" rel="stylesheet" type="text/css"/>\n'
+        html += '<link href="file://' + os.path.join(book.source_path, "css", "stylesheet.css") + '\" rel="stylesheet" type="text/css"/>\n'
+        html += '</head>\n<body>\n'
+
         toc, htm, html = generateParts(book, html)
         html += generateToc(book, toc)
-        html += "<p style=\"page-break-before: always\">"
+        html += '<p style="page-break-before: always">'
         html += htm
-        html += "\n</body>\n</html>"
+        html += '\n</body>\n</html>'
+
         h = HTML(string=html)
-        css = CSS(string='@page { size: ' + book.size + '; margin: 0cm }')
+        css = CSS(string='@page { size: ' + book.size + '; margin: 0cm;}')
         h.write_pdf(filename, stylesheets=[css])
         QApplication.restoreOverrideCursor()
         self.status_bar.showMessage("Ready")
