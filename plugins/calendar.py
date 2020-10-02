@@ -52,6 +52,7 @@ class CalendarGenerator(GeneratorInterface):
         text += '    height: 20px;\n'
         text += '    margin-top: 20px;\n'
         text += '    margin-left: 15px;\n'
+        text += '    font-size: 80%;\n'
         text += '}\n'
         text += '.god\n'
         text += '{\n'
@@ -59,11 +60,11 @@ class CalendarGenerator(GeneratorInterface):
         text += '}\n'
         text += '.moon\n'
         text += '{\n'
-        text += '    background-color: #ff6bcd;\n'
+        text += '    background-color: #bb49ff;\n'
         text += '}\n'
         text += '.ocean\n'
         text += '{\n'
-        text += '    background-color: #a7a7ff;\n'
+        text += '    background-color: #7272ff;\n'
         text += '}\n'
         text += '.heaven\n'
         text += '{\n'
@@ -140,7 +141,7 @@ class CalendarGenerator(GeneratorInterface):
         sday = 1
         dayInWeek = 1
         days = abs((lastdate - actdate).days) + 1
-        #days = 18
+        days = 18
         for weeks in range(1, days + 1):
             if dayInWeek == 1:
                 text += self.header(actdate)
