@@ -11,8 +11,17 @@ If you have got a feature request don't hesitate to contact me at <artanidos@gma
 ## Prerequisits
 In order to work with EbookCreator you have to install the following packages.  
 ```console
+pip3 install --user PyQt5
 pip3 install --user Pygments
+pip3 install --user autocorrect
+pip3 install --user markdown2
+pip3 install --user PyQtWebEngine
+pip3 install --user markupsafe
+pip3 install --user jinja2
+pip3 install --user weasyprint
 ```
+Also have a look at these instructions to install weasyprint
+https://weasyprint.readthedocs.io/en/latest/install.html
 
 ## Basic Steps
 To create a new book, press the "Plus" button and fill out the wizard.

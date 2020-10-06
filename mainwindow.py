@@ -175,7 +175,7 @@ class MainWindow(QMainWindow):
 
         self.splitter = QSplitter()
         self.text_edit = MarkdownEdit()
-        self.text_edit.setFont(QFont("Courier", 11))
+        self.text_edit.setFont(QFont("Courier", 15)) # 11 on Linux
         self.preview = QWebEngineView()
         self.preview.setMinimumWidth(300)
         self.setWindowTitle(QCoreApplication.applicationName())
