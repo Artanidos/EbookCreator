@@ -66,11 +66,12 @@ def getAllFiles(dir):
     file_paths = []
     for root, directories, files in os.walk(dir):
         for filename in files:
-            if root == dir:
-                filepath = filename
-            else:
-                filepath = os.path.join(root[len(dir) + 1:], filename)
-            file_paths.append(filepath)
+            if filename != ".DS_Store":
+                if root == dir:
+                    filepath = filename
+                else:
+                    filepath = os.path.join(root[len(dir) + 1:], filename)
+                file_paths.append(filepath)
     return file_paths
 
 
@@ -105,20 +106,24 @@ def generatePackage(dir, book, uuid):
         if not part.pdfOnly:
             item = {}
             name = part.name.replace(" ", "-").lower()
-            item["href"] = os.path.join("parts", name + ".xhtml")
-            item["id"] = name
-            item["type"] = "application/xhtml+xml"
-            items.append(item)
-            spine.append(name)
+            if name == "toc":
+                pass #only for PDF
+            else:
+                item["href"] = os.path.join("parts", name + ".xhtml")
+                item["id"] = name
+                item["type"] = "application/xhtml+xml"
+                items.append(item)
+                spine.append(name)
 
     for root, dirs, files in os.walk(os.path.join(dir, "EPUB", "images")):
         for file in files:
             filename, extension = os.path.splitext(file)
-            item = {}
-            item["href"] = os.path.join("images", file)
-            item["id"] = filename +"_img"
-            item["type"] = "image/" + extension[1:]
-            items.append(item)
+            if filename != ".DS_Store":
+                item = {}
+                item["href"] = os.path.join("images", file)
+                item["id"] = filename +"_img"
+                item["type"] = "image/" + extension[1:]
+                items.append(item)
 
     context["items"] = items
     context["spine"] = spine
@@ -159,18 +164,21 @@ def generateParts(dir, book):
             with open(os.path.join(book.source_path, "parts", part.src), "r") as i:
                 text = i.read()
             name = part.name.replace(" ", "-").lower()
-            html = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
-            list = getLinks(html, name)
-            for item in list:
-                toc.append(item)
-            context["content"] = html
-            with open(os.path.join(path, "themes", book.theme, "layout", "template.xhtml")) as fp:
-                data = fp.read()
-            tmp = Template(data)
-            xhtml = tmp.render(context)
-            xhtml = addLineNumbers(xhtml)
-            with open(os.path.join(dir, "EPUB", "parts", name + ".xhtml"), "w") as f:
-                f.write(xhtml)
+            if name == "toc":
+                pass #only used to create PDF
+            else:
+                html = fixTables(markdown(text, html4tags = False, extras=["fenced-code-blocks", "wiki-tables", "tables", "header-ids"]))
+                list = getLinks(html, name)
+                for item in list:
+                    toc.append(item)
+                context["content"] = html
+                with open(os.path.join(path, "themes", book.theme, "layout", "template.xhtml")) as fp:
+                    data = fp.read()
+                tmp = Template(data)
+                xhtml = tmp.render(context)
+                xhtml = addLineNumbers(xhtml)
+                with open(os.path.join(dir, "EPUB", "parts", name + ".xhtml"), "w") as f:
+                    f.write(xhtml)
     return toc
 
 

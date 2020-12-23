@@ -1,2 +1,4 @@
 # ToDo
-Syntax highlight is defect
+- Syntax highlight is defect
+- Insert TOC should be a function
+- PdfOnly should be editable

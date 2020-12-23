@@ -1,3 +1,7 @@
+#1.3.1
+- Ignoring now .DS_Store files on Mac
+- Ignoring TOC part for Epub
+
 #1.2.1
 - Ebook are now saved in the books directory on default
 - German version for epub3 added with "Inhaltsverzeichnis"
