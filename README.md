@@ -9,7 +9,7 @@ Because of the fact that the program is written in Python using PyQt5 it should 
 If you have got a feature request don't hesitate to contact me at <artanidos@gmail.com>
 
 ## Prerequisits
-In order to work with EbookCreator you have to install Python 3.x, PIP3 and the following packages.  
+In order to work with EbookCreator you have to install [Python 3.x](https://www.python.org/downloads/), PIP3 and the following packages.  
 ```console
 pip3 install --user PyQt5
 pip3 install --user Pygments
