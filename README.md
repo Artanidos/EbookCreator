@@ -20,8 +20,7 @@ pip3 install --user markupsafe
 pip3 install --user jinja2
 pip3 install --user weasyprint
 ```
-Also have a look at these instructions to install weasyprint
-https://weasyprint.readthedocs.io/en/latest/install.html
+Also have a look at these instructions to install [weasyprint](https://weasyprint.readthedocs.io/en/latest/install.html).
 
 ## Basic Steps
 To create a new book, press the "Plus" button and fill out the wizard.
