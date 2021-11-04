@@ -22,6 +22,12 @@ pip3 install --user weasyprint
 ```
 Also have a look at these instructions to install [weasyprint](https://weasyprint.readthedocs.io/en/latest/install.html).
 
+## Additional installation
+If you are getting an error like *Could not load the Qt platform plugin "xcb"* you should also install the following.
+```console
+sudo apt-get install --reinstall libxcb-xinerama0
+```
+
 ## Basic Steps
 To create a new book, press the "Plus" button and fill out the wizard.
 A new book project will be saved under sources under the install directorylike:  
