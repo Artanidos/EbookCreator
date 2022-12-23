@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright (C) 2020 Olaf Japp
+# Copyright (C) 2022 Olaf Japp
 #
 # This file is part of EbookCreator.
 #
@@ -670,8 +670,8 @@ class MainWindow(QMainWindow):
         self.last_book = settings.value("lastBook")
         if not geometry:
             availableGeometry = QApplication.desktop().availableGeometry(self)
-            self.resize(availableGeometry.width() / 3, availableGeometry.height() / 2)
-            self.move((availableGeometry.width() - self.width()) / 2, (availableGeometry.height() - self.height()) / 2)
+            self.resize(int(availableGeometry.width() / 1.5), int(availableGeometry.height() / 1.5))
+            self.move(int((availableGeometry.width() - self.width()) / 2), int((availableGeometry.height() - self.height()) / 2))
         else:
             self.restoreGeometry(geometry)
 
