@@ -43,7 +43,7 @@ if __name__ == "__main__":
     qmlRegisterType(Ebook, 'EbookCreator', 1, 0, 'Ebook')
     qmlRegisterType(Part, 'EbookCreator', 1, 0, 'Part')
 
-    font = QFont("Sans Serif", 15)  #10 on Linux
+    font = QFont("Sans Serif", 10)  #10 on Linux and Windows, 13 on MacOs
     app.setFont(font)
     app.setWindowIcon(QIcon(":/images/logo.svg"))
 

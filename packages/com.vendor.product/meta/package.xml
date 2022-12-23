@@ -3,7 +3,7 @@
       <DisplayName>EbookCreator</DisplayName>
       <Description>Install this application.</Description>
       <Version>0.1.0-1</Version>
-      <ReleaseDate>2019-07-15</ReleaseDate>
+      <ReleaseDate>2022-12-23</ReleaseDate>
       <Default>true</Default>
       <Script>installscript.qs</Script>
   </Package>

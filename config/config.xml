@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <Installer>
       <Name>EbookCreator</Name>
-      <Version>1.1.0</Version>
+      <Version>1.3.1</Version>
       <Title>EbookCreator</Title>
-      <Publisher>Artanidos</Publisher>
+      <Publisher>CrowdWare</Publisher>
       <StartMenuDir></StartMenuDir>
       <TargetDir>@HomeDir@/EbookCreator</TargetDir>
       <Translations>

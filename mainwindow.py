@@ -820,11 +820,11 @@ class MainWindow(QMainWindow):
             bundle_dir = sys._MEIPASS
             # if we are running in a onefile environment, then copy all plugin to /tmp/...
             if bundle_dir != os.getcwd():
-                os.mkdir(os.path.join(bundle_dir, "plugins"))
+                if not os.path.exists(os.path.join(bundle_dir, "plugins")):
+                    os.mkdir(os.path.join(bundle_dir, "plugins"))
                 for root, dirs, files in os.walk(os.path.join(os.getcwd(), "plugins")):
                     for file in files:
                         shutil.copy(os.path.join(root, file), os.path.join(bundle_dir, "plugins"))
-                        print("copy", file)
                     break # do not copy __pycache__
         else:
             bundle_dir = os.getcwd()
@@ -841,5 +841,4 @@ class MainWindow(QMainWindow):
                             if isinstance(instance, GeneratorInterface):
                                 Plugins.addGeneratorPlugin(name, instance)
                                 instance.setTextEdit(self.text_edit)
-                                #instance.registerContenType()
             break # not to list __pycache__
